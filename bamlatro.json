@@ -1,0 +1,18 @@
+{
+	"id": "bamlatro",
+	"name": "Bamlatro",
+	"display_name": "BAM",
+	"author": ["Thomas R, joqr, hugo"],
+	"description": "A Balatro Mod",
+	"prefix": "bam",
+	"main_file": "main.lua",
+	"priority": 0,
+	"badge_colour": "7932C2",
+	"badge_text_colour": "FFFFFF",
+	"version": "0.0.1",
+	"dependencies": [
+        "Steamodded (>=1.0.0~)",
+        "Lovely (>=0.8.0~)",
+        "Balatro (>=1.0.1~)"
+    ]
+}
