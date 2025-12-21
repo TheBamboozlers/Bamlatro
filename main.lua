@@ -1,2 +1,16 @@
+--Creates an atlas for cards to use
+SMODS.Atlas {
+	-- Key for code to find it with
+	key = "Bamlatro",
+	-- The name of the file, for the code to pull the atlas from
+	path = "Bamlatro.png",
+	-- Width of each sprite in 1x size
+	px = 71,
+	-- Height of each sprite in 1x size
+	py = 95
+}
+
+
+-- Load all lua files
 assert(SMODS.load_file("src/cheats.lua"))() -- remove for release
 assert(SMODS.load_file("src/jokers.lua"))()

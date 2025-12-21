@@ -1,6 +1,11 @@
 -- Joker
 SMODS.Joker {
-    key = "joker",
+    key = "joker2",
+    loc_txt = {
+        name = "Joker 2",
+        text = "This is the in-game description for this joker. {C:mult}+#1# {} Mult" --#1# is a variable that's stored in config, and is put into loc_vars. C:mult is coloring.
+    }
+    atlas = "Bamlatro",
     pos = { x = 0, y = 0 },
     rarity = 1,
     blueprint_compat = true,
