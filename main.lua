@@ -12,5 +12,5 @@ SMODS.Atlas {
 
 
 -- Load all lua files
-assert(SMODS.load_file("src/cheats.lua"))() -- remove for release
-assert(SMODS.load_file("src/jokers.lua"))()
+assert(SMODS.load_file("decks/cheats.lua"))() -- remove for release
+assert(SMODS.load_file("jokers/jokers.lua"))()
