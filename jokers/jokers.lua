@@ -1,3 +1,9 @@
+--[[
+name:
+    FeedTheBeast
+notes:
+    Copies of this joker doesn't eat additional played cards. Maybe fix?
+]]--
 SMODS.Joker{
     key = "feedthebeast",
     loc_txt = {
@@ -59,3 +65,11 @@ SMODS.Joker{
         end
 	end
 }
+
+
+--[[
+name:
+    New Joker
+notes:
+    if you wish
+]]--
