@@ -8,7 +8,7 @@ SMODS.Joker {
         }
     },
     atlas = "Bamlatro",
-    pos = { x = 2, y = 1 },
+    pos = { x = 0, y = 0 },
     rarity = 1,
     blueprint_compat = true,
     cost = 2,
