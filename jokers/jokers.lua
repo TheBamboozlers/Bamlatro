@@ -115,6 +115,73 @@ SMODS.Joker{
 
 --[[
 name:
+    The Short Term
+]]--
+SMODS.Joker{
+    key = "theshortterm",
+    loc_txt = {
+        name = "The Short Term",
+        text = {
+            "After #2# rounds, sell to apply",
+            "{C:dark_edition}negative{} to a random joker.",
+            "{C:inactive}(Currently {}{C:attention}#1#{}{C:inactive}/#2#){}"
+        }
+    },
+    config = {
+        extra = {
+            rounds_accumulated = 0,
+            rounds_threshold = 3,
+            base = 1,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.rounds_accumulated, (card.ability.extra.rounds_threshold * card.ability.extra.base)} }
+	end,
+    atlas = 'Bamlatro',
+    pos = { x = 3, y = 0 },
+    rarity = 1,
+    cost = 6,
+    unlocked = true,
+    discovered = true,
+    blueprint_compat = false,
+    eternal_compat = false,
+
+    calculate = function(self, card, context)
+        if context.selling_self and (card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base)) and not context.blueprint then
+            local jokers = {}
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] ~= card then
+                    jokers[#jokers + 1] = G.jokers.cards[i]
+                end
+            end
+            local chosen_index = math.random(1, #jokers)
+            local chosen_joker = jokers[chosen_index]
+            print(chosen_index)
+            print(chosen_joker.name)
+            chosen_joker:set_edition({ negative = true })
+            return { 
+                message = "Negative!",
+                colour = G.C.Negative
+            }
+        end
+        if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+            card.ability.extra.rounds_accumulated = card.ability.extra.rounds_accumulated + 1
+            if card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base) then
+                local eval = function(card) return not card.REMOVED end
+                juice_card_until(card, eval, true)
+            end
+            return {
+                message = (card.ability.extra.rounds_accumulated < (card.ability.extra.rounds_threshold * card.ability.extra.base)) and
+                    (card.ability.extra.rounds_accumulated .. '/' .. (card.ability.extra.rounds_threshold * card.ability.extra.base)) or
+                    localize('k_active_ex'),
+                colour = G.C.FILTER
+            }
+        end
+    end,
+}
+
+--[[
+name:
     New Joker
 notes:
     if you wish
