@@ -182,6 +182,143 @@ SMODS.Joker{
 
 --[[
 name:
+    The Long Game
+]]--
+SMODS.Joker{
+    key = "thelonggame",
+    loc_txt = {
+        name = "The Long Game",
+        text = {
+            "After #2# rounds, sell to duplicate",
+            "2 random jokers with {C:dark_edition}negative{}.",
+            "{C:inactive}(Currently {}{C:attention}#1#{}{C:inactive}/#2#){}"
+        }
+    },
+    config = {
+        extra = {
+            rounds_accumulated = 0,
+            rounds_threshold = 3,
+            base = 1,
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.rounds_accumulated, (card.ability.extra.rounds_threshold * card.ability.extra.base)} }
+	end,
+    atlas = 'Bamlatro',
+    pos = { x = 3, y = 0 },
+    rarity = 1,
+    cost = 6,
+    unlocked = true,
+    discovered = true,
+    blueprint_compat = false,
+    eternal_compat = false,
+
+    calculate = function(self, card, context)
+        if context.selling_self and (card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base)) and not context.blueprint then
+            local jokers = {}
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] ~= card then
+                    jokers[#jokers + 1] = G.jokers.cards[i]
+                end
+            end
+            local chosen_index = math.random(1, #jokers)
+            local chosen_joker = jokers[chosen_index]
+            print(chosen_index)
+            print(chosen_joker.name)
+            chosen_joker:set_edition({ negative = true })
+            return { 
+                message = "Negative!",
+                colour = G.C.Negative
+            }
+        end
+        if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+            card.ability.extra.rounds_accumulated = card.ability.extra.rounds_accumulated + 1
+            if card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base) then
+                local eval = function(card) return not card.REMOVED end
+                juice_card_until(card, eval, true)
+            end
+            return {
+                message = (card.ability.extra.rounds_accumulated < (card.ability.extra.rounds_threshold * card.ability.extra.base)) and
+                    (card.ability.extra.rounds_accumulated .. '/' .. (card.ability.extra.rounds_threshold * card.ability.extra.base)) or
+                    localize('k_active_ex'),
+                colour = G.C.FILTER
+            }
+        end
+    end,
+}
+
+--[[
+name:
+    Andres
+]]--
+SMODS.Joker{
+    key = "andres",
+    config = {
+        extra = {
+            bonusCardsToDraw = 0,
+            card_draw0 = 1,
+            card_draw = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Andres',
+        ['text'] = {
+            [1] = 'For each {C:blue}6{} or {C:blue}7{} scored,',
+            [2] = 'draw an additional card',
+            [3] = 'the next time you draw.',
+            [4] = '{C:inactive}(Currently #1# cards){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 6,
+    rarity = 1,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 4, y = 0 },
+    
+    loc_vars = function(self, info_queue, card)
+        
+        return {vars = {card.ability.extra.bonusCardsToDraw}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+            if (context.other_card:get_id() == 6 or context.other_card:get_id() == 7) then
+                local target_card = context.other_card
+                card.ability.extra.bonusCardsToDraw = (card.ability.extra.bonusCardsToDraw) + 1
+                return true
+            end
+        end
+        if context.hand_drawn or context.other_drawn then
+            if (card.ability.extra.bonusCardsToDraw or 0) > 0 then
+                local bonusCardsToDraw_value = card.ability.extra.bonusCardsToDraw
+                if G.hand and #G.hand.cards > 0 then
+                    SMODS.draw_cards(bonusCardsToDraw_value)
+                end
+                return {
+                    message = "+"..tostring(bonusCardsToDraw_value).." Cards Drawn",
+                    extra = {
+                        func = function()
+                            card.ability.extra.bonusCardsToDraw = 0
+                            return true
+                        end,
+                        colour = G.C.BLUE
+                    }
+                }
+            end
+        end
+    end
+}
+
+
+--[[
+name:
     New Joker
 notes:
     if you wish
