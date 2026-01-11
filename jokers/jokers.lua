@@ -316,6 +316,102 @@ SMODS.Joker{
     end
 }
 
+--[[
+name:
+    CS:GO Crates
+]]--
+SMODS.Joker{
+    key = "csgocrates",
+    config = {
+        extra = {
+            sellValueIncrease = 1,
+            odds = 10
+        }
+    },
+    loc_txt = {
+        ['name'] = 'CS:GO Crates',
+        ['text'] = {
+            [1] = 'After every round, {X:money,C:white}double{}',
+            [2] = 'this joker\'s sell value.',
+            [3] = 'After every shop, {C:green} #3# in #4# {}',
+            [4] = 'chance for market crash.',
+            [5] = '{C:money}Max value $100.{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 2,
+    rarity = 1,
+    blueprint_compat = false,
+    eternal_compat = false,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 5, y = 0 },
+    
+    loc_vars = function(self, info_queue, card)
+        local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_csgocrates') 
+        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.end_of_round and context.game_over == false and context.main_eval  then
+            return {
+                func = function()
+                    card.ability.extra.sellValueIncrease = (card.ability.extra.sellValueIncrease) * 2
+                    return true
+                end,
+                extra = {
+                    func = function()local my_pos = nil
+                        for i = 1, #G.jokers.cards do
+                            if G.jokers.cards[i] == card then
+                                my_pos = i
+                                break
+                            end
+                        end
+                        local target_card = G.jokers.cards[my_pos]
+                        if card.ability.extra.sellValueIncrease > 100 then
+                            card.ability.extra.sellValueIncrease = 100
+                        end
+                        target_card.ability.extra_value = (card.ability.extra.sellValueIncrease - 1)
+                        target_card:set_cost()
+                        return true
+                    end,
+                    message = (card.ability.extra.sellValueIncrease >= 63) and "Max!" or "Double!",
+                    colour = (card.ability.extra.sellValueIncrease >= 63) and G.C.FILTER or G.C.MONEY
+                }
+            }
+        end
+        if context.ending_shop then
+            if SMODS.pseudorandom_probability(card, 'group_0_344f8d99', 1, card.ability.extra.odds, 'j_bam_csgocrates', false) then
+                return {
+                    func = function()
+                        card.ability.extra.sellValueIncrease = 1
+                        return true
+                    end,
+                    extra = {
+                        func = function()local my_pos = nil
+                            for i = 1, #G.jokers.cards do
+                                if G.jokers.cards[i] == card then
+                                    my_pos = i
+                                    break
+                                end
+                            end
+                            local target_card = G.jokers.cards[my_pos]
+                            target_card.ability.extra_value = (card.ability.extra.sellValueIncrease - 1)
+                            target_card:set_cost()
+                            return true
+                        end,
+                        message = "Market Crash!!",
+                        colour = G.C.RED
+                    }
+                }
+            end
+        end
+    end
+}
 
 --[[
 name:
