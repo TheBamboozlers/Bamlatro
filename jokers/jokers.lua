@@ -415,6 +415,60 @@ SMODS.Joker{
 
 --[[
 name:
+    patch1236
+]]--
+SMODS.Joker{
+    key = "patch1236",
+    config = {
+        extra = {
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Patch 1.23.6',
+        ['text'] = {
+            [1] = 'Whenever a {C:attention}Queen{} is scored,',
+            [2] = 'convert it to a {C:attention}King{}',
+            [3] = 'with a {C:dark_edition}random Edition{}.',
+            [4] = '{C:inactive}(Initial hand still scores){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 6, y = 0 },
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+            if context.other_card:get_id() == 12 then
+                local scored_card = context.other_card
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        assert(SMODS.change_base(scored_card, scored_card.base.suit, "King"))
+                        local edition = pseudorandom_element({'e_foil','e_holo','e_polychrome'}, 'random edition')
+                        scored_card:set_edition(edition, true)
+                        return true
+                    end
+                }))
+                return {
+                    extra = {
+                        message = "Yaoi!",
+                        colour = G.C.RED
+                    }
+                }
+            end
+        end
+    end
+}
+--[[
+name:
     New Joker
 notes:
     if you wish
