@@ -10,6 +10,10 @@ SMODS.Atlas {
 	py = 95
 }
 
+SMODS.Sound {
+    key = "sfx_redhomas",
+	path = "redhomas.ogg",
+}
 
 -- Load all lua files
 assert(SMODS.load_file("decks/cheats.lua"))() -- remove for release

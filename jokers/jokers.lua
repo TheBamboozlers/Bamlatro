@@ -415,6 +415,143 @@ SMODS.Joker{
 
 --[[
 name:
+    patch1236
+]]--
+SMODS.Joker{
+    key = "patch1236",
+    config = {
+        extra = {
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Patch 1.23.6',
+        ['text'] = {
+            [1] = 'Whenever a {C:attention}Queen{} is scored,',
+            [2] = 'convert it to a {C:attention}King{}',
+            [3] = 'with a {C:dark_edition}random Edition{}.',
+            [4] = '{C:inactive}(Initial hand still scores){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 6, y = 0 },
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+            if context.other_card:get_id() == 12 then
+                local scored_card = context.other_card
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        assert(SMODS.change_base(scored_card, scored_card.base.suit, "King"))
+                        local edition = pseudorandom_element({'e_foil','e_holo','e_polychrome'}, 'random edition')
+                        scored_card:set_edition(edition, true)
+                        return true
+                    end
+                }))
+                return {
+                    extra = {
+                        message = "Yaoi!",
+                        colour = G.C.RED
+                    }
+                }
+            end
+        end
+    end
+}
+
+--[[
+name:
+    redhomas
+]]--
+SMODS.Joker{
+    key = "redhomas",
+    config = {
+        extra = {
+            odds = 1,
+            xmult0 = 1.25
+        }
+    },
+    loc_txt = {
+        ['name'] = 'redhomas',
+        ['text'] = {
+            [1] = '{X:red,C:white}X1.25{} Mult.',
+            [2] = 'Every round,{C:green} #1# in #2# {}chance',
+            [3] = 'to duplicate this joker.',
+            [4] = '{C:dark_edition}Copies are negative.{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 7, y = 0 },
+    
+    loc_vars = function(self, info_queue, card)
+        
+        local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_redhomas') 
+        return {vars = {new_numerator, new_denominator}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.first_hand_drawn then
+            if SMODS.pseudorandom_probability(card, 'group_0_02d9f56b', 1, card.ability.extra.odds, 'j_bam_redhomas', false) then
+                SMODS.calculate_effect({func = function()
+                    local target_joker = nil
+                    for i = 1, #G.jokers.cards do
+                        if G.jokers.cards[i] == card then
+                            target_joker = G.jokers.cards[i]
+                            break
+                        end
+                    end
+                    if #G.jokers.cards + G.GAME.joker_buffer < G.jokers.config.card_limit then
+                        G.GAME.joker_buffer = G.GAME.joker_buffer + 1
+                        G.E_MANAGER:add_event(Event({
+                            func = function()
+                                local copied_joker = copy_card(target_joker, nil, nil, nil, target_joker.edition and target_joker.edition.negative)
+                                copied_joker:set_edition("e_negative", true)
+                                copied_joker:add_to_deck()
+                                G.jokers:emplace(copied_joker)
+                                G.GAME.joker_buffer = 0
+                                play_sound('bam_sfx_redhomas', 1, 0.4)
+                                return true
+                            end
+                        }))
+                    end
+                end}, card)
+                return {
+                    message = ":redhomas:",
+                    colour = G.C.RED,
+                    --sound = 'bam_sfx_redhomas',
+                }
+            end
+        end
+        if context.cardarea == G.jokers and context.joker_main  then
+            return {
+                Xmult = 1.25
+            }
+        end
+    end
+}
+
+
+--[[
+name:
     New Joker
 notes:
     if you wish
