@@ -184,7 +184,7 @@ SMODS.Joker{
 name:
     The Long Game
 ]]--
-SMODS.Joker{
+--[[SMODS.Joker{
     key = "thelonggame",
     loc_txt = {
         name = "The Long Game",
@@ -245,7 +245,7 @@ SMODS.Joker{
             }
         end
     end,
-}
+}]]--
 
 --[[
 name:
