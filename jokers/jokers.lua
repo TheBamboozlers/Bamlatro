@@ -4,7 +4,7 @@ name:
 notes:
     Copies of this joker doesn't eat additional played cards. Maybe fix?
 ]]--
-SMODS.Joker{
+--[[SMODS.Joker{
     key = "feedthebeast",
     loc_txt = {
         name = "Feed The Beast",
@@ -64,7 +64,7 @@ SMODS.Joker{
 			}
         end
 	end
-}
+}]]--
 
 --[[
 name:
@@ -117,7 +117,7 @@ SMODS.Joker{
 name:
     The Short Term
 ]]--
-SMODS.Joker{
+--[[SMODS.Joker{
     key = "theshortterm",
     loc_txt = {
         name = "The Short Term",
@@ -178,7 +178,7 @@ SMODS.Joker{
             }
         end
     end,
-}
+}]]--
 
 --[[
 name:
@@ -476,7 +476,7 @@ SMODS.Joker{
     key = "redhomas",
     config = {
         extra = {
-            odds = 1,
+            odds = 6,
             xmult0 = 1.25
         }
     },
@@ -545,6 +545,187 @@ SMODS.Joker{
             return {
                 Xmult = 1.25
             }
+        end
+    end
+}
+
+--[[
+name:
+    Justin
+]]--
+SMODS.Joker{
+    key = "justin",
+    config = {
+        extra = {
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Justin',
+        ['text'] = {
+            [1] = '{C:inactive}\"I can play anything.\"{}',
+            [2] = 'Each hand, you may play up to',
+            [3] = 'as many cards as {C:attention}hand size{}.'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 0, y = 1 },
+    
+    calculate = function(self, card, context)
+        SMODS.change_play_limit(G.hand.config.card_limit - G.GAME.starting_params.play_limit)
+    end,
+    
+    --[[add_to_deck = function(self, card, from_debuff)
+        SMODS.change_play_limit(99)
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        SMODS.change_play_limit(-99)
+    end]]--
+}
+
+--[[
+name:
+    Miata
+]]--
+SMODS.Joker{
+    key = "miata",
+    config = {
+        extra = {
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Miata',
+        ['text'] = {
+            [1] = 'If {C:attention}first hand{} of round is a',
+            [2] = 'single {C:attention}2{}, gain a {C:tarot}Charm Tag{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 1, y = 1 },
+    calculate = function(self, card, context)
+        if context.cardarea == G.jokers and context.joker_main  then
+            if (G.GAME.current_round.hands_played == 0 and #context.scoring_hand) == 1 and (function()
+                local count = 0
+                for _, playing_card in pairs(context.scoring_hand or {}) do
+                    if playing_card:get_id() == 2 then
+                        count = count + 1
+                    end
+                end
+                return count == #context.scoring_hand
+            end)() then
+                G.E_MANAGER:add_event(Event({
+                    func = function()
+                        local tag = Tag("tag_charm")
+                        if tag.name == "Orbital Tag" then
+                            local _poker_hands = {}
+                            for k, v in pairs(G.GAME.hands) do
+                                if v.visible then
+                                    _poker_hands[#_poker_hands + 1] = k
+                                end
+                            end
+                            tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                        end
+                        tag:set_ability()
+                        add_tag(tag)
+                        play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                        return true
+                    end
+                }))
+                return {
+                    message = "Created Tag!"
+                }
+            end
+        end
+    end
+}
+
+--[[
+name:
+    Daniel
+]]--
+SMODS.Joker{
+    key = "daniel",
+    config = {
+        extra = {
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Daniel',
+        ['text'] = {
+            [1] = 'If final score is within',
+            [2] = '{C:attention}20%{} of blind requirement,',
+            [3] = 'gain a {C:tarot}Ethereal Tag{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    pos = {
+        x = 0,
+        y = 0
+    },
+    display_size = {
+        w = 71 * 1, 
+        h = 95 * 1
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 2, y = 1 },
+    
+    calculate = function(self, card, context)
+        if context.end_of_round and context.game_over == false and context.main_eval  then
+            if (G.GAME.chips / G.GAME.blind.chips <= 1.2) then
+                return {
+                    func = function()
+                        G.E_MANAGER:add_event(Event({
+                            func = function()
+                                local tag = Tag("tag_ethereal")
+                                if tag.name == "Orbital Tag" then
+                                    local _poker_hands = {}
+                                    for k, v in pairs(G.GAME.hands) do
+                                        if v.visible then
+                                            _poker_hands[#_poker_hands + 1] = k
+                                        end
+                                    end
+                                    tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                                end
+                                tag:set_ability()
+                                add_tag(tag)
+                                play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                                return true
+                            end
+                        }))
+                        return true
+                    end,
+                    message = "Created Tag!"
+                }
+            end
         end
     end
 }
