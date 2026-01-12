@@ -476,7 +476,7 @@ SMODS.Joker{
     key = "redhomas",
     config = {
         extra = {
-            odds = 1,
+            odds = 6,
             xmult0 = 1.25
         }
     },
@@ -658,6 +658,78 @@ SMODS.Joker{
         end
     end
 }
+
+--[[
+name:
+    Daniel
+]]--
+SMODS.Joker{
+    key = "daniel",
+    config = {
+        extra = {
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Daniel',
+        ['text'] = {
+            [1] = 'If final score is within',
+            [2] = '{C:attention}20%{} of blind requirement,',
+            [3] = 'gain a {C:tarot}Ethereal Tag{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    pos = {
+        x = 0,
+        y = 0
+    },
+    display_size = {
+        w = 71 * 1, 
+        h = 95 * 1
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 2, y = 1 },
+    
+    calculate = function(self, card, context)
+        if context.end_of_round and context.game_over == false and context.main_eval  then
+            if (G.GAME.chips / G.GAME.blind.chips <= 1.2) then
+                return {
+                    func = function()
+                        G.E_MANAGER:add_event(Event({
+                            func = function()
+                                local tag = Tag("tag_ethereal")
+                                if tag.name == "Orbital Tag" then
+                                    local _poker_hands = {}
+                                    for k, v in pairs(G.GAME.hands) do
+                                        if v.visible then
+                                            _poker_hands[#_poker_hands + 1] = k
+                                        end
+                                    end
+                                    tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                                end
+                                tag:set_ability()
+                                add_tag(tag)
+                                play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                                return true
+                            end
+                        }))
+                        return true
+                    end,
+                    message = "Created Tag!"
+                }
+            end
+        end
+    end
+}
+
 
 --[[
 name:
