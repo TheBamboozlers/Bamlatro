@@ -4,7 +4,7 @@ name:
 notes:
     Copies of this joker doesn't eat additional played cards. Maybe fix?
 ]]--
-SMODS.Joker{
+--[[SMODS.Joker{
     key = "feedthebeast",
     loc_txt = {
         name = "Feed The Beast",
@@ -64,7 +64,7 @@ SMODS.Joker{
 			}
         end
 	end
-}
+}]]--
 
 --[[
 name:
@@ -117,7 +117,7 @@ SMODS.Joker{
 name:
     The Short Term
 ]]--
-SMODS.Joker{
+--[[SMODS.Joker{
     key = "theshortterm",
     loc_txt = {
         name = "The Short Term",
@@ -178,7 +178,7 @@ SMODS.Joker{
             }
         end
     end,
-}
+}]]--
 
 --[[
 name:
@@ -607,7 +607,7 @@ SMODS.Joker{
         ['name'] = 'Miata',
         ['text'] = {
             [1] = 'If {C:attention}first hand{} of round is a',
-            [2] = 'single {C:attention}2{}, create a {C:tarot}Charm Tag{}'
+            [2] = 'single {C:attention}2{}, gain a {C:tarot}Charm Tag{}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
