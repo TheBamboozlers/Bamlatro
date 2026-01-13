@@ -622,6 +622,12 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 1, y = 1 },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_charm
+        return {vars = {}}
+    end,
+
     calculate = function(self, card, context)
         if context.cardarea == G.jokers and context.joker_main  then
             if (G.GAME.current_round.hands_played == 0 and #context.scoring_hand) == 1 and (function()
@@ -673,20 +679,12 @@ SMODS.Joker{
         ['name'] = 'Daniel',
         ['text'] = {
             [1] = 'If final score is within',
-            [2] = '{C:attention}20%{} of blind requirement,',
+            [2] = '{C:attention}25%{} of blind requirement,',
             [3] = 'gain a {C:tarot}Ethereal Tag{}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
         }
-    },
-    pos = {
-        x = 0,
-        y = 0
-    },
-    display_size = {
-        w = 71 * 1, 
-        h = 95 * 1
     },
     cost = 4,
     rarity = 1,
@@ -697,10 +695,15 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 2, y = 1 },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_ethereal
+        return {vars = {}}
+    end,
     
     calculate = function(self, card, context)
         if context.end_of_round and context.game_over == false and context.main_eval  then
-            if (G.GAME.chips / G.GAME.blind.chips <= 1.2) then
+            if (G.GAME.chips / G.GAME.blind.chips <= 1.25) then
                 return {
                     func = function()
                         G.E_MANAGER:add_event(Event({
@@ -713,7 +716,7 @@ SMODS.Joker{
                                             _poker_hands[#_poker_hands + 1] = k
                                         end
                                     end
-                                    tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                                    tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "bam_orbital")
                                 end
                                 tag:set_ability()
                                 add_tag(tag)
@@ -730,7 +733,94 @@ SMODS.Joker{
     end
 }
 
-
+--[[
+name:
+    Inheritance
+]]--
+SMODS.Joker{
+    key = "inheritance",
+    config = {
+        extra = {
+            cardsBought = 0
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Inheritance',
+        ['text'] = {
+            [1] = 'For every {C:attention}4{} cards {C:attention}bought{}',
+            [2] = 'while having this joker,',
+            [3] = 'gain an {C:money}Economy Tag{}',
+            [4] = 'upon {C:attention}selling{} this joker.',
+            [5] = '{C:inactive}(Currently #1# cards){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 3, y = 1 },
+    
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_economy
+        return {vars = {card.ability.extra.cardsBought}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.buying_card  then
+            if (function()
+                for i, v in pairs(G.jokers.cards) do
+                    if v.config.center.key == "j_bam_inheritance" then 
+                        return true
+                    end
+                end
+            end)() then
+                return {
+                    func = function()
+                        card.ability.extra.cardsBought = (card.ability.extra.cardsBought) + 1
+                        return true
+                    end,
+                }
+            end
+        end
+        if context.selling_self then
+            return {
+                func = function()
+                    local times = card.ability.extra.cardsBought / 4
+                    for i = 1, times do
+                        G.E_MANAGER:add_event(Event({
+                            func = function()
+                                local tag = Tag("tag_economy")
+                                if tag.name == "Orbital Tag" then
+                                    local _poker_hands = {}
+                                    for k, v in pairs(G.GAME.hands) do
+                                        if v.visible then
+                                            _poker_hands[#_poker_hands + 1] = k
+                                        end
+                                    end
+                                    tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                                end
+                                tag:set_ability()
+                                add_tag(tag)
+                                play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                                return true
+                            end
+                        }))
+                    end
+                    return true
+                end,
+                message = "Inheritance!",
+                colour = G.C.MONEY,
+            }
+        end
+    end
+}
 --[[
 name:
     New Joker
