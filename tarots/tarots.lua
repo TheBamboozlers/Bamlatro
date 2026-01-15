@@ -5,7 +5,8 @@ SMODS.Consumable {
     loc_txt = {
         name = 'Bamboozle',
         text = {
-            [1] = 'A {C:purple}custom{} consumable with {C:blue}unique{} effects.'
+            [1] = 'Applies {C:purple}Bamboozled{} to',
+            [2] = 'selected {X:legendary,C:white}Bamlatro{} Joker.'
         }
     },
     cost = 3,
@@ -14,7 +15,13 @@ SMODS.Consumable {
     hidden = false,
     can_repeat_soul = false,
     atlas = 'Bamlatro',
-    pos = { x = 6, y = 0 },
+    pos = { x = 1, y = 3 },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.e_bam_bamboozled
+        return {vars = {}}
+    end,
+
     use = function(self, card, area, copier)
         local used_card = copier or card
         if #G.jokers.highlighted == 1 then

@@ -101,7 +101,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 2, y = 0 },
+    pos = { x = 1, y = 0 },
 
     loc_vars = function(self, info_queue, card)
         
@@ -287,7 +287,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 4, y = 0 },
+    pos = { x = 2, y = 0 },
     
     loc_vars = function(self, info_queue, card)
         
@@ -357,7 +357,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 5, y = 0 },
+    pos = { x = 3, y = 0 },
     
     loc_vars = function(self, info_queue, card)
         local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_csgocrates') 
@@ -453,7 +453,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 6, y = 0 },
+    pos = { x = 4, y = 0 },
 
     loc_vars = function(self, info_queue, card)
         
@@ -464,21 +464,23 @@ SMODS.Joker{
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play  then
             if context.other_card:get_id() == 12 then
-                local scored_card = context.other_card
-                G.E_MANAGER:add_event(Event({
-                    func = function()
-                        assert(SMODS.change_base(scored_card, scored_card.base.suit, "King"))
-                        local edition = pseudorandom_element({'e_foil','e_holo','e_polychrome'}, 'random edition')
-                        scored_card:set_edition(edition, true)
-                        return true
-                    end
-                }))
-                return {
-                    extra = {
-                        message = "Yaoi!",
-                        colour = G.C.RED
+                if SMODS.pseudorandom_probability(card, 'group_0_344f8d99', card.ability.extra.bam_bonus, card.ability.extra.odds, 'j_bam_patch1236', false) then
+                    local scored_card = context.other_card
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            assert(SMODS.change_base(scored_card, scored_card.base.suit, "King"))
+                            local edition = pseudorandom_element({'e_foil','e_holo','e_polychrome'}, 'random edition')
+                            scored_card:set_edition(edition, true)
+                            return true
+                        end
+                    }))
+                    return {
+                        extra = {
+                            message = "Yaoi!",
+                            colour = G.C.RED
+                        }
                     }
-                }
+                end
             end
         end
     end
@@ -517,7 +519,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 7, y = 0 },
+    pos = { x = 5, y = 0 },
     
     loc_vars = function(self, info_queue, card)
         
@@ -597,7 +599,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 0, y = 1 },
+    pos = { x = 6, y = 0 },
 
     loc_vars = function(self, info_queue, card)
         return {vars = {2-card.ability.extra.bam_bonus}}
@@ -660,7 +662,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 1, y = 1 },
+    pos = { x = 7, y = 0 },
 
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_charm
@@ -740,7 +742,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 2, y = 1 },
+    pos = { x = 0, y = 1 },
 
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_ethereal
@@ -816,7 +818,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 3, y = 1 },
+    pos = { x = 1, y = 1 },
     
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_economy
@@ -905,7 +907,7 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 4, y = 1 },
+    pos = { x = 2, y = 1 },
     
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_double
@@ -936,7 +938,7 @@ SMODS.Joker{
                     }
                 end
 
-                if card.ability.extra.jacksScored == (card.ability.extra.jackThreshold-card.ability.extra.bam_bonus) then
+                if card.ability.extra.jacksScored >= (card.ability.extra.jackThreshold-card.ability.extra.bam_bonus) then
                     card.ability.extra.jacksScored = 0
                     return {
                         func = function()
