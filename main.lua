@@ -18,3 +18,6 @@ SMODS.Sound {
 -- Load all lua files
 assert(SMODS.load_file("decks/cheats.lua"))() -- remove for release
 assert(SMODS.load_file("jokers/jokers.lua"))()
+
+assert(SMODS.load_file("editions/editions.lua"))()
+assert(SMODS.load_file("tarots/tarots.lua"))()

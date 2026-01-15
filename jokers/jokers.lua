@@ -74,14 +74,15 @@ SMODS.Joker{
     key = "_2mas",
     config = {
         extra = {
-            xmult0 = 2.2
+            xmult0 = 2.2,
+            bam_bonus = 1
         }
     },
     loc_txt = {
         ['name'] = '2Mas',
         ['text'] = {
             [1] = 'Every played {C:blue}2{}',
-            [2] = 'gives {C:red}x2.2 Mult{}',
+            [2] = 'gives {C:red}x#1# Mult{}',
             [3] = 'when scored.'
         },
         ['unlock'] = {
@@ -101,12 +102,17 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 2, y = 0 },
+
+    loc_vars = function(self, info_queue, card)
+        
+        return {vars = {card.ability.extra.xmult0 * card.ability.extra.bam_bonus}}
+    end,
     
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play  then
             if context.other_card:get_id() == 2 then
                 return {
-                    Xmult = 2.2
+                    Xmult = card.ability.extra.xmult0 * bam_bonus
                 }
             end
         end
@@ -257,14 +263,15 @@ SMODS.Joker{
         extra = {
             bonusCardsToDraw = 0,
             card_draw0 = 1,
-            card_draw = 1
+            card_draw = 1,
+            bam_bonus = 1
         }
     },
     loc_txt = {
         ['name'] = 'Andres',
         ['text'] = {
             [1] = 'For each {C:blue}6{} or {C:blue}7{} scored,',
-            [2] = 'draw an additional card',
+            [2] = 'draw #2# additional card',
             [3] = 'the next time you draw.',
             [4] = '{C:inactive}(Currently #1# cards){}'
         },
@@ -284,14 +291,14 @@ SMODS.Joker{
     
     loc_vars = function(self, info_queue, card)
         
-        return {vars = {card.ability.extra.bonusCardsToDraw}}
+        return {vars = {card.ability.extra.bonusCardsToDraw, card.ability.extra.bam_bonus}}
     end,
     
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play  then
             if (context.other_card:get_id() == 6 or context.other_card:get_id() == 7) then
                 local target_card = context.other_card
-                card.ability.extra.bonusCardsToDraw = (card.ability.extra.bonusCardsToDraw) + 1
+                card.ability.extra.bonusCardsToDraw = (card.ability.extra.bonusCardsToDraw) + (1 * card.ability.extra.bam_bonus)
                 return true
             end
         end
@@ -325,7 +332,8 @@ SMODS.Joker{
     config = {
         extra = {
             sellValueIncrease = 1,
-            odds = 10
+            odds = 10,
+            bam_bonus = 1
         }
     },
     loc_txt = {
@@ -333,9 +341,9 @@ SMODS.Joker{
         ['text'] = {
             [1] = 'After every round, {X:money,C:white}double{}',
             [2] = 'this joker\'s sell value.',
-            [3] = 'After every shop, {C:green} #3# in #4# {}',
+            [3] = 'After every shop, {C:green}#3# in #4#{}',
             [4] = 'chance for market crash.',
-            [5] = '{C:money}Max value $100.{}'
+            [5] = '{C:money}Max value $#5#.{}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -353,7 +361,7 @@ SMODS.Joker{
     
     loc_vars = function(self, info_queue, card)
         local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_csgocrates') 
-        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator}}
+        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator, 100*card.ability.extra.bam_bonus}}
     end,
     
     calculate = function(self, card, context)
@@ -372,8 +380,8 @@ SMODS.Joker{
                             end
                         end
                         local target_card = G.jokers.cards[my_pos]
-                        if card.ability.extra.sellValueIncrease > 100 then
-                            card.ability.extra.sellValueIncrease = 100
+                        if card.ability.extra.sellValueIncrease > 100*card.ability.extra.bam_bonus then
+                            card.ability.extra.sellValueIncrease = 100*card.ability.extra.bam_bonus
                         end
                         target_card.ability.extra_value = (card.ability.extra.sellValueIncrease - 1)
                         target_card:set_cost()
@@ -421,14 +429,16 @@ SMODS.Joker{
     key = "patch1236",
     config = {
         extra = {
+            odds = 4,
+            bam_bonus = 1
         }
     },
     loc_txt = {
         ['name'] = 'Patch 1.23.6',
         ['text'] = {
             [1] = 'Whenever a {C:attention}Queen{} is scored,',
-            [2] = 'convert it to a {C:attention}King{}',
-            [3] = 'with a {C:dark_edition}random Edition{}.',
+            [2] = '{C:green}#1# in #2#{} chance to convert it',
+            [3] = 'to a {C:attention}King{} with a {C:dark_edition}random Edition{}.',
             [4] = '{C:inactive}(Initial hand still scores){}'
         },
         ['unlock'] = {
@@ -444,6 +454,12 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 6, y = 0 },
+
+    loc_vars = function(self, info_queue, card)
+        
+        local new_numerator, new_denominator = SMODS.get_probability_vars(card, card.ability.extra.bam_bonus, card.ability.extra.odds, 'j_bam_redhomas') 
+        return {vars = {new_numerator, new_denominator}}
+    end,
     
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play  then
@@ -477,13 +493,14 @@ SMODS.Joker{
     config = {
         extra = {
             odds = 6,
-            xmult0 = 1.25
+            xmult0 = 1.25,
+            bam_bonus = 1
         }
     },
     loc_txt = {
         ['name'] = 'redhomas',
         ['text'] = {
-            [1] = '{X:red,C:white}X1.25{} Mult.',
+            [1] = '{X:red,C:white}X#3#{} Mult.',
             [2] = 'Every round,{C:green} #1# in #2# {}chance',
             [3] = 'to duplicate this joker.',
             [4] = '{C:dark_edition}Copies are negative.{}'
@@ -505,7 +522,7 @@ SMODS.Joker{
     loc_vars = function(self, info_queue, card)
         
         local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_redhomas') 
-        return {vars = {new_numerator, new_denominator}}
+        return {vars = {new_numerator, new_denominator, (card.ability.extra.bam_bonus*0.25)+1}}
     end,
     
     calculate = function(self, card, context)
@@ -543,7 +560,7 @@ SMODS.Joker{
         end
         if context.cardarea == G.jokers and context.joker_main  then
             return {
-                Xmult = 1.25
+                Xmult = (card.ability.extra.bam_bonus*0.25)+1
             }
         end
     end
@@ -557,6 +574,7 @@ SMODS.Joker{
     key = "justin",
     config = {
         extra = {
+            bam_bonus = 1
         }
     },
     loc_txt = {
@@ -564,7 +582,8 @@ SMODS.Joker{
         ['text'] = {
             [1] = '{C:inactive}\"I can play anything.\"{}',
             [2] = 'Each hand, you may play up to',
-            [3] = 'as many cards as {C:attention}hand size{}.'
+            [3] = 'as many cards as {C:attention}hand size{}.',
+            [4] = 'Each hand, lose {C:money}-$#1#{}.'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -579,9 +598,28 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 0, y = 1 },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {2-card.ability.extra.bam_bonus}}
+    end,
     
     calculate = function(self, card, context)
         SMODS.change_play_limit(G.hand.config.card_limit - G.GAME.starting_params.play_limit)
+
+        if context.cardarea == G.jokers and context.joker_main  then
+            return {
+                
+                func = function()
+                    
+                    local current_dollars = G.GAME.dollars
+                    local target_dollars = G.GAME.dollars - (2-bam_bonus)
+                    local dollar_value = target_dollars - current_dollars
+                    ease_dollars(dollar_value)
+                    card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = "-"..tostring(2-bam_bonus), colour = G.C.MONEY})
+                    return true
+                end
+            }
+        end
     end,
     
     --[[add_to_deck = function(self, card, from_debuff)
@@ -601,13 +639,14 @@ SMODS.Joker{
     key = "miata",
     config = {
         extra = {
+            bam_bonus = 1
         }
     },
     loc_txt = {
         ['name'] = 'Miata',
         ['text'] = {
             [1] = 'If {C:attention}first hand{} of round is a',
-            [2] = 'single {C:attention}2{}, gain a {C:tarot}Charm Tag{}'
+            [2] = 'single {C:attention}2{}, gain #1# {C:tarot}Charm Tag{}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -622,6 +661,12 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 1, y = 1 },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_charm
+        return {vars = {card.ability.extra.bam_bonus}}
+    end,
+
     calculate = function(self, card, context)
         if context.cardarea == G.jokers and context.joker_main  then
             if (G.GAME.current_round.hands_played == 0 and #context.scoring_hand) == 1 and (function()
@@ -633,25 +678,31 @@ SMODS.Joker{
                 end
                 return count == #context.scoring_hand
             end)() then
-                G.E_MANAGER:add_event(Event({
-                    func = function()
-                        local tag = Tag("tag_charm")
-                        if tag.name == "Orbital Tag" then
-                            local _poker_hands = {}
-                            for k, v in pairs(G.GAME.hands) do
-                                if v.visible then
-                                    _poker_hands[#_poker_hands + 1] = k
-                                end
-                            end
-                            tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
-                        end
-                        tag:set_ability()
-                        add_tag(tag)
-                        play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
-                        return true
-                    end
-                }))
                 return {
+                    func = function()
+                        local times = card.ability.extra.bam_bonus
+                        for i = 1, times do
+                            G.E_MANAGER:add_event(Event({
+                                func = function()
+                                    local tag = Tag("tag_charm")
+                                    if tag.name == "Orbital Tag" then
+                                        local _poker_hands = {}
+                                        for k, v in pairs(G.GAME.hands) do
+                                            if v.visible then
+                                                _poker_hands[#_poker_hands + 1] = k
+                                            end
+                                        end
+                                        tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "bam_orbital")
+                                    end
+                                    tag:set_ability()
+                                    add_tag(tag)
+                                    play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                                    return true
+                                end
+                            }))
+                        end
+                        return true
+                    end,
                     message = "Created Tag!"
                 }
             end
@@ -667,26 +718,19 @@ SMODS.Joker{
     key = "daniel",
     config = {
         extra = {
+            bam_bonus = 1
         }
     },
     loc_txt = {
         ['name'] = 'Daniel',
         ['text'] = {
             [1] = 'If final score is within',
-            [2] = '{C:attention}20%{} of blind requirement,',
+            [2] = '{C:attention}#1#%{} of blind requirement,',
             [3] = 'gain a {C:tarot}Ethereal Tag{}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
         }
-    },
-    pos = {
-        x = 0,
-        y = 0
-    },
-    display_size = {
-        w = 71 * 1, 
-        h = 95 * 1
     },
     cost = 4,
     rarity = 1,
@@ -697,15 +741,113 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 2, y = 1 },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_ethereal
+        return {vars = {card.ability.extra.bam_bonus*25}}
+    end,
     
     calculate = function(self, card, context)
         if context.end_of_round and context.game_over == false and context.main_eval  then
-            if (G.GAME.chips / G.GAME.blind.chips <= 1.2) then
+            if (G.GAME.chips / G.GAME.blind.chips <= ((card.ability.extra.bam_bonus*0.25)+1)) then
                 return {
                     func = function()
+                        local times = card.ability.extra.bam_bonus
+                        for i = 1, times do
+                            G.E_MANAGER:add_event(Event({
+                                func = function()
+                                    local tag = Tag("tag_ethereal")
+                                    if tag.name == "Orbital Tag" then
+                                        local _poker_hands = {}
+                                        for k, v in pairs(G.GAME.hands) do
+                                            if v.visible then
+                                                _poker_hands[#_poker_hands + 1] = k
+                                            end
+                                        end
+                                        tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "bam_orbital")
+                                    end
+                                    tag:set_ability()
+                                    add_tag(tag)
+                                    play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                                    return true
+                                end
+                            }))
+                        end
+                        return true
+                    end,
+                    message = "Created Tag!"
+                }
+            end
+        end
+    end
+}
+
+--[[
+name:
+    Inheritance
+]]--
+SMODS.Joker{
+    key = "inheritance",
+    config = {
+        extra = {
+            cardsBought = 0,
+            countedSelfYet = false,
+            bam_bonus = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Inheritance',
+        ['text'] = {
+            [1] = 'For every {C:attention}#2#{} cards {C:attention}bought{}',
+            [2] = 'while having this joker,',
+            [3] = 'gain an {C:money}Economy Tag{}',
+            [4] = 'upon {C:attention}selling{} this joker.',
+            [5] = '{C:inactive}(Currently #1# cards){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 3, y = 1 },
+    
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_economy
+        return {vars = {card.ability.extra.cardsBought, (5-card.ability.extra.bam_bonus)}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.buying_card and not context.buying_self then
+            if (function()
+                for i, v in pairs(G.jokers.cards) do
+                    if v.config.center.key == "j_bam_inheritance" then 
+                        return true
+                    end
+                end
+            end)() then
+                return {
+                    func = function()
+                        card.ability.extra.cardsBought = (card.ability.extra.cardsBought) + 1
+                        return true
+                    end,
+                }
+            end
+        end
+        if context.selling_self then
+            return {
+                func = function()
+                    local times = card.ability.extra.cardsBought / (5-card.ability.extra.bam_bonus)
+                    for i = 1, times do
                         G.E_MANAGER:add_event(Event({
                             func = function()
-                                local tag = Tag("tag_ethereal")
+                                local tag = Tag("tag_economy")
                                 if tag.name == "Orbital Tag" then
                                     local _poker_hands = {}
                                     for k, v in pairs(G.GAME.hands) do
@@ -720,17 +862,112 @@ SMODS.Joker{
                                 play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
                                 return true
                             end
-                        }))
-                        return true
-                    end,
-                    message = "Created Tag!"
-                }
+                        }))    
+                    end
+                    return true
+                end,
+                message = "Inheritance!",
+                colour = G.C.MONEY,
+            }
+        end
+    end,
+}
+
+--[[
+name:
+    James
+]]--
+SMODS.Joker{
+    key = "james",
+    config = {
+        extra = {
+            jacksScored = 0,
+            jackThreshold = 9,
+            bam_bonus = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'James',
+        ['text'] = {
+            [1] = 'For every {C:attention}#2# Jacks{} scored',
+            [2] = 'gain an {C:blue}Double Tag{}',
+            [3] = '{C:inactive}(Currently #1#/#2#){}',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 1,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 4, y = 1 },
+    
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_double
+        return {vars = {card.ability.extra.jacksScored, card.ability.extra.jackThreshold-card.ability.extra.bam_bonus}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play then
+            if context.other_card:get_id() == 11 then
+
+                card.ability.extra.jacksScored = (card.ability.extra.jacksScored) + 1
+
+                if card.ability.extra.jacksScored < (card.ability.extra.jackThreshold-card.ability.extra.bam_bonus) then
+                    return {
+                        extra = {
+                            --card:juice_up(1, 1)
+                            --message = "J Up!",
+                            --message_card = card,
+                            func = function() -- This is for timing purposes, everything here runs after the message
+                                G.E_MANAGER:add_event(Event({
+                                    func = (function()
+                                        card:juice_up()
+                                        return true
+                                    end)
+                                }))
+                            end
+                        },
+                    }
+                end
+
+                if card.ability.extra.jacksScored == (card.ability.extra.jackThreshold-card.ability.extra.bam_bonus) then
+                    card.ability.extra.jacksScored = 0
+                    return {
+                        func = function()
+                            G.E_MANAGER:add_event(Event({
+                                func = function()
+                                    local tag = Tag("tag_double")
+                                    if tag.name == "Orbital Tag" then
+                                        local _poker_hands = {}
+                                        for k, v in pairs(G.GAME.hands) do
+                                            if v.visible then
+                                                _poker_hands[#_poker_hands + 1] = k
+                                            end
+                                        end
+                                        tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                                    end
+                                    tag:set_ability()
+                                    add_tag(tag)
+                                    play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                                    return true
+                                end
+                            }))
+                        end,
+                        message = "James!",
+                        message_card = card,
+                        colour = G.C.BLUE,
+                    }
+                end
             end
         end
     end
 }
-
-
 --[[
 name:
     New Joker
