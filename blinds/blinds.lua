@@ -310,3 +310,40 @@ SMODS.Blind {
         print("---------------------")
     end
 }
+
+SMODS.Blind {
+    key = "placeholder_003",
+    atlas = "BamlatroBlinds",
+    pos = {
+        x = 0,
+        y = 0,
+    },
+    vars = {
+        timestamp = 0,
+        defeated = false,
+    },
+    loc_txt = {
+        name = 'Placeholder 003',
+        text = {
+            [1] = 'Only \'X of a Kind\'',
+            [2] = 'hand types allowed.',
+            [3] = 'When defeated, shop',
+            [4] = 'gains extra card slot',
+        }
+    },
+    discovered = true,
+    dollars = 5,
+    mult = 2,
+    boss = {min = 1},
+    boss_colour = G.C.RED,
+
+
+
+    defeat = function(self)
+        change_shop_size(1)
+    end,
+
+    debuff_hand = function(self, cards, hand, handname, check)
+        return (handname == "High Card" or handname == "Pair" or handname == "Two Pair" or handname == "Straight" or handname == "Flush" or handname == "Full House" or handname == "Straight Flush" or handname == "Flush House")
+    end
+}
