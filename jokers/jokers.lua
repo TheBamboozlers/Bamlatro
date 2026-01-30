@@ -1,3 +1,20 @@
+SMODS.ObjectType {
+    key = "bam_jokers",
+    cards = {
+        ["j_bam_2mas"] = true,
+        ["j_bam_andres"] = true,
+        ["j_bam_csgocrates"] = true,
+        ["j_bam_patch1236"] = true,
+        ["j_bam_redhomas"] = true,
+        ["j_bam_justin"] = true,
+        ["j_bam_miata"] = true,
+        ["j_bam_daniel"] = true,
+        ["j_bam_inheritance"] = true,
+        ["j_bam_james"] = true,
+        ["j_bam_placeholder_004"] = true,
+    }
+}
+
 --[[
 name:
     FeedTheBeast
@@ -71,7 +88,7 @@ name:
     2Mas
 ]]--
 SMODS.Joker{
-    key = "_2mas",
+    key = "2mas",
     config = {
         extra = {
             xmult0 = 2.2,
@@ -102,6 +119,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 1, y = 0 },
+    pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
         
@@ -112,7 +130,7 @@ SMODS.Joker{
         if context.individual and context.cardarea == G.play  then
             if context.other_card:get_id() == 2 then
                 return {
-                    Xmult = card.ability.extra.xmult0 * bam_bonus
+                    Xmult = card.ability.extra.xmult0 * card.ability.extra.bam_bonus
                 }
             end
         end
@@ -280,7 +298,7 @@ SMODS.Joker{
         }
     },
     cost = 6,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
@@ -288,6 +306,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 2, y = 0 },
+    pools = { ["bam_jokers"] = true },
     
     loc_vars = function(self, info_queue, card)
         
@@ -350,7 +369,7 @@ SMODS.Joker{
         }
     },
     cost = 2,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = false,
     eternal_compat = false,
     perishable_compat = true,
@@ -358,6 +377,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 3, y = 0 },
+    pools = { ["bam_jokers"] = true },
     
     loc_vars = function(self, info_queue, card)
         local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_csgocrates') 
@@ -446,7 +466,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = false,
     eternal_compat = true,
     perishable_compat = true,
@@ -454,6 +474,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 4, y = 0 },
+    pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
         
@@ -512,7 +533,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = false,
     eternal_compat = true,
     perishable_compat = true,
@@ -520,6 +541,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 5, y = 0 },
+    pools = { ["bam_jokers"] = true },
     
     loc_vars = function(self, info_queue, card)
         
@@ -592,7 +614,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = false,
     eternal_compat = true,
     perishable_compat = true,
@@ -600,6 +622,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 6, y = 0 },
+    pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
         return {vars = {2-card.ability.extra.bam_bonus}}
@@ -614,7 +637,7 @@ SMODS.Joker{
                 func = function()
                     
                     local current_dollars = G.GAME.dollars
-                    local target_dollars = G.GAME.dollars - (2-bam_bonus)
+                    local target_dollars = G.GAME.dollars - (2-self.config.extra.bam_bonus) --TODO BUG TEST THIS!!
                     local dollar_value = target_dollars - current_dollars
                     ease_dollars(dollar_value)
                     card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = "-"..tostring(2-bam_bonus), colour = G.C.MONEY})
@@ -655,7 +678,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
@@ -663,6 +686,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 7, y = 0 },
+    pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_charm
@@ -735,7 +759,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
@@ -743,6 +767,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 0, y = 1 },
+    pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_ethereal
@@ -811,7 +836,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
@@ -819,6 +844,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 1, y = 1 },
+    pools = { ["bam_jokers"] = true },
     
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_economy
@@ -900,7 +926,7 @@ SMODS.Joker{
         }
     },
     cost = 4,
-    rarity = 1,
+    rarity = 2,
     blueprint_compat = false,
     eternal_compat = true,
     perishable_compat = true,
@@ -908,6 +934,7 @@ SMODS.Joker{
     discovered = true,
     atlas = 'Bamlatro',
     pos = { x = 2, y = 1 },
+    pools = { ["bam_jokers"] = true },
     
     loc_vars = function(self, info_queue, card)
         info_queue[#info_queue+1] = G.P_TAGS.tag_double
@@ -976,3 +1003,55 @@ name:
 notes:
     if you wish
 ]]--
+SMODS.Joker{
+    key = "placeholder_004",
+    config = {
+        extra = {
+            bam_bonus = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 004',
+        ['text'] = {
+            [1] = '{C:enhanced}+2 Joker Slots.{}',
+            [2] = '{X:red,C:white}X#1#{} Mult.',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    display_size = {
+        w = 71 * 1, 
+        h = 95 * 1
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 1, y = 0 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {0.5 * card.ability.extra.bam_bonus}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return {
+                Xmult = 0.5 * card.ability.extra.bam_bonus
+            }
+        end
+    end,
+
+    add_to_deck = function(self, card, from_debuff)
+        G.jokers.config.card_limit = G.jokers.config.card_limit + 2
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        G.jokers.config.card_limit = G.jokers.config.card_limit - 2
+    end
+}

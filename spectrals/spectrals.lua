@@ -1,18 +1,21 @@
 SMODS.Consumable {
-    key = 'bamboozle',
+    key = 'taptheglass',
     set = 'Spectral',
     loc_txt = {
-        name = 'Bamboozle',
+        name = 'Tap The Glass',
         text = {
             [1] = 'Applies {C:purple}Bamboozled{} to',
             [2] = 'selected {X:legendary,C:white}Bamlatro{} Joker.'
         }
     },
-    cost = 3,
+    cost = 10,
     unlocked = true,
     discovered = true,
-    hidden = false,
-    can_repeat_soul = false,
+    soul_set = 'Spectral',
+    soul_rate = 1,
+    hidden = true,
+    can_repeat_soul = true,
+    soul_set = 'Spectral',
     atlas = 'Bamlatro',
     pos = { x = 2, y = 3 },
 
@@ -79,7 +82,12 @@ SMODS.Consumable {
             delay(0.5)
         end
     end,
+
     can_use = function(self, card)
-        return (#G.jokers.highlighted == 1)
+        return (#G.jokers.highlighted == 1) -- and string.sub(G.jokers.highlighted.key,1,5) == "j_bam") -- TODO: FIX THIS
+    end,
+
+    in_pool = function(self, args)
+        return math.random(1,(math.floor( 333 / G.GAME.legendary_spectral_bonus ))) == 1
     end
 }

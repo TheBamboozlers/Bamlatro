@@ -17,6 +17,27 @@ SMODS.Atlas {
 	px = 34,
 	py = 34,
 }
+SMODS.Atlas {
+	key = "BamlatroVouchers",
+	path = "BamlatroVouchers.png",
+	px = 71,
+	py = 95,
+}
+SMODS.Atlas {
+	key = "BamlatroVouchersAnimated",
+	path = "BamlatroVouchersAnimated.png",
+	atlas_table = "ANIMATION_ATLAS",
+	frames = 9,
+	px = 71,
+	py = 105,
+}
+SMODS.Atlas {
+	key = "BamlatroEnhancements",
+	path = "BamlatroEnhancements.png",
+	px = 71,
+	py = 95,
+}
+
 
 SMODS.Sound {
     key = "sfx_redhomas",
@@ -38,8 +59,12 @@ SMODS.Sound {
 -- Load all lua files
 assert(SMODS.load_file("decks/cheats.lua"))() -- remove for release
 
-assert(SMODS.load_file("decks/vanilla_edits.lua"))()
+assert(SMODS.load_file("vanilla_edits.lua"))()
 assert(SMODS.load_file("jokers/jokers.lua"))()
 assert(SMODS.load_file("editions/editions.lua"))()
 assert(SMODS.load_file("tarots/tarots.lua"))()
+assert(SMODS.load_file("spectrals/spectrals.lua"))()
 assert(SMODS.load_file("blinds/blinds.lua"))()
+assert(SMODS.load_file("rarities/rarities.lua"))()
+assert(SMODS.load_file("vouchers/vouchers.lua"))()
+assert(SMODS.load_file("seals/seals.lua"))()
