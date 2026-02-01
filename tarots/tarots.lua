@@ -1,20 +1,27 @@
 
 SMODS.Consumable {
-    key = 'mytest',
-    set = 'Tarot',
+    key = 'placeholder_009',
+    set = 'Spectral',
     loc_txt = {
-        name = 'My Test',
+        name = 'Placeholder 009',
         text = {
-            [1] = 'seal'
+            [1] = 'Add a {C:purple}Bam Seal{}',
+            [2] = 'to {C:attention}1{} selected',
+            [3] = 'card in your hand',
         }
     },
-    cost = 3,
+    cost = 6,
     unlocked = true,
     discovered = true,
     hidden = false,
     can_repeat_soul = false,
     atlas = 'Bamlatro',
-    pos = { x = 1, y = 3 },
+    pos = { x = 2, y = 3 },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_SEALS["bam_seal"]
+        return {vars={}}
+    end,
 
     use = function(self, card, area, copier)
         local used_card = copier or card
@@ -46,7 +53,7 @@ SMODS.Consumable {
                 trigger = 'after',
                 delay = 0.1,
                 func = function()
-                    G.hand.highlighted[i]:set_seal("bam_spam", nil, true)
+                    G.hand.highlighted[i]:set_seal("bam_bam_seal", nil, true)
                     return true
                 end
             }))

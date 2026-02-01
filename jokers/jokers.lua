@@ -139,140 +139,6 @@ SMODS.Joker{
 
 --[[
 name:
-    The Short Term
-]]--
---[[SMODS.Joker{
-    key = "theshortterm",
-    loc_txt = {
-        name = "The Short Term",
-        text = {
-            "After #2# rounds, sell to apply",
-            "{C:dark_edition}negative{} to a random joker.",
-            "{C:inactive}(Currently {}{C:attention}#1#{}{C:inactive}/#2#){}"
-        }
-    },
-    config = {
-        extra = {
-            rounds_accumulated = 0,
-            rounds_threshold = 3,
-            base = 1,
-        }
-    },
-    loc_vars = function(self, info_queue, card)
-		return { vars = {card.ability.extra.rounds_accumulated, (card.ability.extra.rounds_threshold * card.ability.extra.base)} }
-	end,
-    atlas = 'Bamlatro',
-    pos = { x = 3, y = 0 },
-    rarity = 1,
-    cost = 6,
-    unlocked = true,
-    discovered = true,
-    blueprint_compat = false,
-    eternal_compat = false,
-
-    calculate = function(self, card, context)
-        if context.selling_self and (card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base)) and not context.blueprint then
-            local jokers = {}
-            for i = 1, #G.jokers.cards do
-                if G.jokers.cards[i] ~= card then
-                    jokers[#jokers + 1] = G.jokers.cards[i]
-                end
-            end
-            local chosen_index = math.random(1, #jokers)
-            local chosen_joker = jokers[chosen_index]
-            print(chosen_index)
-            print(chosen_joker.name)
-            chosen_joker:set_edition({ negative = true })
-            return { 
-                message = "Negative!",
-                colour = G.C.Negative
-            }
-        end
-        if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
-            card.ability.extra.rounds_accumulated = card.ability.extra.rounds_accumulated + 1
-            if card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base) then
-                local eval = function(card) return not card.REMOVED end
-                juice_card_until(card, eval, true)
-            end
-            return {
-                message = (card.ability.extra.rounds_accumulated < (card.ability.extra.rounds_threshold * card.ability.extra.base)) and
-                    (card.ability.extra.rounds_accumulated .. '/' .. (card.ability.extra.rounds_threshold * card.ability.extra.base)) or
-                    localize('k_active_ex'),
-                colour = G.C.FILTER
-            }
-        end
-    end,
-}]]--
-
---[[
-name:
-    The Long Game
-]]--
---[[SMODS.Joker{
-    key = "thelonggame",
-    loc_txt = {
-        name = "The Long Game",
-        text = {
-            "After #2# rounds, sell to duplicate",
-            "2 random jokers with {C:dark_edition}negative{}.",
-            "{C:inactive}(Currently {}{C:attention}#1#{}{C:inactive}/#2#){}"
-        }
-    },
-    config = {
-        extra = {
-            rounds_accumulated = 0,
-            rounds_threshold = 3,
-            base = 1,
-        }
-    },
-    loc_vars = function(self, info_queue, card)
-		return { vars = {card.ability.extra.rounds_accumulated, (card.ability.extra.rounds_threshold * card.ability.extra.base)} }
-	end,
-    atlas = 'Bamlatro',
-    pos = { x = 3, y = 0 },
-    rarity = 1,
-    cost = 6,
-    unlocked = true,
-    discovered = true,
-    blueprint_compat = false,
-    eternal_compat = false,
-
-    calculate = function(self, card, context)
-        if context.selling_self and (card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base)) and not context.blueprint then
-            local jokers = {}
-            for i = 1, #G.jokers.cards do
-                if G.jokers.cards[i] ~= card then
-                    jokers[#jokers + 1] = G.jokers.cards[i]
-                end
-            end
-            local chosen_index = math.random(1, #jokers)
-            local chosen_joker = jokers[chosen_index]
-            print(chosen_index)
-            print(chosen_joker.name)
-            chosen_joker:set_edition({ negative = true })
-            return { 
-                message = "Negative!",
-                colour = G.C.Negative
-            }
-        end
-        if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
-            card.ability.extra.rounds_accumulated = card.ability.extra.rounds_accumulated + 1
-            if card.ability.extra.rounds_accumulated >= (card.ability.extra.rounds_threshold * card.ability.extra.base) then
-                local eval = function(card) return not card.REMOVED end
-                juice_card_until(card, eval, true)
-            end
-            return {
-                message = (card.ability.extra.rounds_accumulated < (card.ability.extra.rounds_threshold * card.ability.extra.base)) and
-                    (card.ability.extra.rounds_accumulated .. '/' .. (card.ability.extra.rounds_threshold * card.ability.extra.base)) or
-                    localize('k_active_ex'),
-                colour = G.C.FILTER
-            }
-        end
-    end,
-}]]--
-
---[[
-name:
     Andres
 ]]--
 SMODS.Joker{
@@ -459,7 +325,7 @@ SMODS.Joker{
             [1] = 'Whenever a {C:attention}Queen{} is scored,',
             [2] = '{C:green}#1# in #2#{} chance to convert it',
             [3] = 'to a {C:attention}King{} with a {C:dark_edition}random Edition{}.',
-            [4] = '{C:inactive}(Initial hand still scores){}'
+            [4] = '{C:inactive}(Initial hand type still scores){}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -491,7 +357,7 @@ SMODS.Joker{
                         func = function()
                             assert(SMODS.change_base(scored_card, scored_card.base.suit, "King"))
                             local edition = pseudorandom_element({'e_foil','e_holo','e_polychrome'}, 'random edition')
-                            scored_card:set_edition(edition, true)
+                            --scored_card:set_edition(edition, true)
                             return true
                         end
                     }))
@@ -640,7 +506,7 @@ SMODS.Joker{
                     local target_dollars = G.GAME.dollars - (2-self.config.extra.bam_bonus) --TODO BUG TEST THIS!!
                     local dollar_value = target_dollars - current_dollars
                     ease_dollars(dollar_value)
-                    card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = "-"..tostring(2-bam_bonus), colour = G.C.MONEY})
+                    card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = "-"..tostring(2-self.config.extra.bam_bonus), colour = G.C.MONEY})
                     return true
                 end
             }
@@ -752,7 +618,7 @@ SMODS.Joker{
         ['text'] = {
             [1] = 'If final score is within',
             [2] = '{C:attention}#1#%{} of blind requirement,',
-            [3] = 'gain a {C:tarot}Ethereal Tag{}'
+            [3] = 'gain a {C:spectral}Ethereal Tag{}'
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -910,7 +776,7 @@ SMODS.Joker{
     config = {
         extra = {
             jacksScored = 0,
-            jackThreshold = 9,
+            jackThreshold = 5,
             bam_bonus = 1
         }
     },
@@ -999,9 +865,7 @@ SMODS.Joker{
 }
 --[[
 name:
-    New Joker
-notes:
-    if you wish
+    Placeholder 004
 ]]--
 SMODS.Joker{
     key = "placeholder_004",
@@ -1013,7 +877,7 @@ SMODS.Joker{
     loc_txt = {
         ['name'] = 'Placeholder 004',
         ['text'] = {
-            [1] = '{C:enhanced}+2 Joker Slots.{}',
+            [1] = '{C:enhanced}+#2# Joker Slots.{}',
             [2] = '{X:red,C:white}X#1#{} Mult.',
         },
         ['unlock'] = {
@@ -1032,11 +896,11 @@ SMODS.Joker{
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 1, y = 0 },
+    pos = { x = 3, y = 1 },
     pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
-        return {vars = {0.5 * card.ability.extra.bam_bonus}}
+        return {vars = {(0.5 * card.ability.extra.bam_bonus), (card.ability.extra.bam_bonus + 1)}}
     end,
     
     calculate = function(self, card, context)
@@ -1048,10 +912,423 @@ SMODS.Joker{
     end,
 
     add_to_deck = function(self, card, from_debuff)
-        G.jokers.config.card_limit = G.jokers.config.card_limit + 2
+        G.jokers.config.card_limit = G.jokers.config.card_limit + (card.ability.extra.bam_bonus + 1)
     end,
     
     remove_from_deck = function(self, card, from_debuff)
-        G.jokers.config.card_limit = G.jokers.config.card_limit - 2
+        G.jokers.config.card_limit = G.jokers.config.card_limit - (card.ability.extra.bam_bonus + 1)
     end
 }
+
+--[[
+name:
+    Placeholder 010
+]]--
+SMODS.Joker{
+    key = "placeholder_010",
+    config = {
+        extra = {
+            bam_bonus = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 010',
+        ['text'] = {
+            [1] = 'Whenever a {C:planet}planet card{} is used,',
+            [2] = '{C:attention}destroy{} up to {C:attention}#1# selected{}',
+            [3] = 'playing card in hand'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    display_size = {
+        w = 71 * 1, 
+        h = 95 * 1
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 4, y = 1 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.bam_bonus}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.using_consumeable then
+            if context.consumeable and context.consumeable.ability.set == 'Planet' then
+                for i = 0, self.config.extra.bam_bonus do
+                    if #G.hand.highlighted >= 1 then
+                        local card_to_destroy = pseudorandom_element(G.hand.highlighted, pseudoseed('destroy_card'))
+                        G.E_MANAGER:add_event(Event({
+                            func = function()
+                                card_to_destroy:start_dissolve()
+                                return true
+                            end
+                        }))
+                    end
+                end
+            end
+        end
+    end,
+}
+
+--[[
+name:
+    Placeholder 011
+]]--
+SMODS.Joker{
+    key = "placeholder_011",
+    config = {
+        extra = {
+            bam_bonus = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 011',
+        ['text'] = {
+            [1] = 'Whenever you play a',
+            [2] = '{C:attention}\'X of a kind\'{} hand type,',
+            [3] = 'gain #1# {C:tarot}The Emperor{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    display_size = {
+        w = 71 * 1, 
+        h = 95 * 1
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 5, y = 1 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.c_emperor
+        return {vars = {card.ability.extra.bam_bonus}}
+    end,
+
+    calculate = function(self, card, context)
+        if context.cardarea == G.jokers and context.joker_main  then
+            if next(context.poker_hands["Three of a Kind"] or context.poker_hands["Four of a Kind"] or context.poker_hands["Five of a Kind"] or context.poker_hands["Flush Five"]) then
+                for i = 1, math.min(self.config.extra.bam_bonus, G.consumeables.config.card_limit - #G.consumeables.cards) do
+                    G.E_MANAGER:add_event(Event({
+                        trigger = 'after',
+                        delay = 0.4,
+                        func = function()
+                            play_sound('timpani')
+                            SMODS.add_card({ set = 'Tarot', key = 'c_emperor'})                            
+                            card:juice_up(0.3, 0.5)
+                            return true
+                        end
+                    }))
+                end
+                delay(0.6)
+                return {
+                    message = created_consumable and localize('k_plus_tarot') or nil
+                }
+            end
+        end
+    end
+}
+
+--[[
+name:
+    Tinkers Construct
+]]--
+SMODS.Joker{
+    key = "tinkersconstruct",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            emult0 = 1.25,
+            dollars0 = 1
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Tinkers\' Construct',
+        ['text'] = {
+            [1] = '{C:money}Gold cards{} held in hand',
+            [2] = 'also give {X:mult,C:white}X#1#{} Mult, and',
+            [3] = '{C:inactive}Steel cards{} held in hand',
+            [4] = 'at end of round also give {C:money}$#2#{}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    display_size = {
+        w = 71 * 1, 
+        h = 95 * 1
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 6, y = 1 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {(1+(0.25*card.ability.extra.bam_bonus)), (card.ability.extra.bam_bonus*2)-1}}
+    end,
+    
+   calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.hand and not context.end_of_round  then
+            if SMODS.get_enhancements(context.other_card)["m_gold"] == true then
+                return {
+                    xmult = (1+(0.25*card.ability.extra.bam_bonus))
+                }
+            end
+        end
+        if context.individual and context.cardarea == G.hand and context.end_of_round  then
+            if SMODS.get_enhancements(context.other_card)["m_steel"] == true then
+                return {
+                    dollars = ((card.ability.extra.bam_bonus*2)-1)
+                }
+            end
+        end
+    end
+}
+
+
+--[[
+name: OP Down Mid
+]]--
+SMODS.Joker{
+    key = "opdownmid",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            hands_removed = 0,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'OP Down Mid!',
+        ['text'] = {
+            [1] = 'For every {C:blue}hand{} above 1,',
+            [2] = 'increase {C:attention}hand size{} by that amount.',
+            [3] = 'Play at most #1# hand per round.',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 7, y = 1 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.bam_bonus}}
+    end,
+    
+    calculate = function(self, card, context)
+        if G.GAME.round_resets.hands ~= card.ability.extra.bam_bonus then
+            local diff = G.GAME.round_resets.hands - card.ability.extra.bam_bonus
+            G.hand:change_size(diff)
+            card.ability.extra.hands_removed = card.ability.extra.hands_removed + diff
+            G.GAME.round_resets.hands = card.ability.extra.bam_bonus
+        end
+    end,
+    
+    add_to_deck = function(self, card, from_debuff)
+        card.ability.extra.hands_removed = G.GAME.round_resets.hands - 1
+        G.GAME.round_resets.hands = card.ability.extra.bam_bonus
+        G.hand:change_size(card.ability.extra.hands_removed)
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.round_resets.hands = 1 + card.ability.extra.hands_removed
+        G.hand:change_size(-1*card.ability.extra.hands_removed) 
+        G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + card.ability.extra.hands_removed
+        card.ability.extra.hands_removed = 0
+    end
+}
+
+--[[
+name: Prop Hunt
+]]--
+SMODS.Joker{
+    key = "prophunt",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            odds = 3,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Prop Hunt',
+        ['text'] = {
+            [1] = 'Whenever a {C:attention}numbered card{} is scored, {C:green}#1# in #2#{} chance',
+            [2] = 'to convert it to #3# random {C:attention}face card{}.',
+            [3] = 'Whenever a {C:attention}face card{} is scored, {C:green}#1# in #2#{} chance',
+            [4] = 'to convert it to #3# random {C:attention}numbered card{}.',
+            [5] = '{C:inactive}(Initial hand type still scores){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 0, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_prophunt') 
+        return {vars = {new_numerator, new_denominator, card.ability.extra.bam_bonus}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+            if context.other_card:is_face() then
+                if SMODS.pseudorandom_probability(card, 'group_0_d421f98e', 1, card.ability.extra.odds, 'j_modprefix_test', false) then
+                    local scored_card = context.other_card
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            local rank = pseudorandom_element({"2","3","4","5","6","7","8","9","10"}, 'edit_card_rank')
+                            assert(SMODS.change_base(scored_card, scored_card.base.suit, rank))
+
+                            if self.config.extra.bam_bonus >= 2 then
+                                G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+                                local copied_card = copy_card(scored_card, nil, nil, G.playing_card)
+                                assert(SMODS.change_base(copied_card, copied_card.base.suit, rank))
+                                copied_card:add_to_deck()
+                                G.deck.config.card_limit = G.deck.config.card_limit + 1
+                                table.insert(G.playing_cards, copied_card)
+                                G.hand:emplace(copied_card)
+                                playing_card_joker_effects({true})
+                                G.E_MANAGER:add_event(Event({
+                                    func = function() 
+                                        copied_card:start_materialize()
+                                        return true
+                                    end
+                                }))
+                            end
+                            return true
+                        end
+                    }))
+                    return {
+                        extra = {
+                            message = "Prop Hunt!",
+                            colour = G.C.ORANGE
+                        }
+                    }
+                end
+            elseif context.other_card.base.value ~= "Ace" then
+                if SMODS.pseudorandom_probability(card, 'group_0_3d68cd6e', 1, card.ability.extra.odds, 'j_bam_prophunt', false) then
+                    local scored_card = context.other_card
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            local rank = pseudorandom_element({"Jack","Queen","King"}, 'edit_card_rank')
+                            assert(SMODS.change_base(scored_card, scored_card.base.suit, rank))
+
+                            if self.config.extra.bam_bonus >= 2 then
+                                G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+                                local copied_card = copy_card(scored_card, nil, nil, G.playing_card)
+                                assert(SMODS.change_base(copied_card, copied_card.base.suit, rank))
+                                copied_card:add_to_deck()
+                                G.deck.config.card_limit = G.deck.config.card_limit + 1
+                                table.insert(G.playing_cards, copied_card)
+                                G.hand:emplace(copied_card)
+                                playing_card_joker_effects({true})
+                                G.E_MANAGER:add_event(Event({
+                                    func = function() 
+                                        copied_card:start_materialize()
+                                        return true
+                                    end
+                                }))
+                            end
+                            return true
+                        end
+                    }))
+                    return {
+                        extra = {
+                            message = "Prop Hunt!",
+                            colour = G.C.ORANGE
+                        }
+                    }
+                end
+            end
+        end
+    end
+}
+
+
+--[[
+name: Crash Out
+]]--
+--[[SMODS.Joker{
+    key = "crashout",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Crash Out',
+        ['text'] = {
+            [1] = 'Played cards are 
+            [2] = 'always debuffed.',
+            [4] = 'Retrigger all jokers.',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 0, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_prophunt') 
+        return {vars = {new_numerator, new_denominator, card.ability.extra.bam_bonus}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+        
+            local scored_card = context.other_card
+            SMODS.debuff_card(scored_card, true, "crashout")
+                
+            return true
+        end
+    end
+}]]--

@@ -15,7 +15,7 @@ SMODS.Back {
     pos = { x = 0, y = 0 },
     config = { 
         dollars = 9999999, 
-        hands = 99, 
+        hands = 0, 
         discards = 99, 
         joker_slot = 10, 
         vouchers = {"v_overstock_norm", "v_overstock_plus", "v_directors_cut","v_retcon"}, -- {voucher = 'v_crystal_ball', 
@@ -47,7 +47,7 @@ SMODS.Back {
 
 
 
-                SMODS.change_booster_limit(20)
+                SMODS.change_booster_limit(1)
             end
             
             if self.config.extra.begin_extra_voucher == true then
