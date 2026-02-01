@@ -52,7 +52,7 @@ SMODS.Consumable {
         ['name'] = 'Black Hole',
         ['text'] = {
             [1] = 'Upgrade every',
-            [2] = '{c:tarot}poker hand{}',
+            [2] = '{C:purple}poker hand{}',
             [3] = 'by {C:attention}1{} level',
         },
         ['unlock'] = {
@@ -130,4 +130,17 @@ SMODS.Consumable:take_ownership('c_soul', {
         return math.random(1,(math.floor( 333 / (G.GAME.legendary_spectral_bonus or 1) ))) == 1
     end
 
+},true)
+
+SMODS.Booster:take_ownership('p_spectral_normal_1', {
+    weight = 1,
+},true)
+SMODS.Booster:take_ownership('p_spectral_normal_2', {
+    weight = 1,
+},true)
+SMODS.Booster:take_ownership('p_spectral_jumbo_1', {
+    weight = 1,
+},true)
+SMODS.Booster:take_ownership('p_spectral_mega_1', {
+    weight = 0.3,
 },true)

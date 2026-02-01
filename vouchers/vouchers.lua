@@ -97,6 +97,8 @@ SMODS.Voucher {
             func = function()
                 SMODS.add_card({key="j_bootstraps"})
                 SMODS.add_card({key="j_bull"})
+                SMODS.add_card({key="j_bam_prophunt"})
+                SMODS.add_card({key="j_bam_patch1236"})
                 return true
             end
         }))
@@ -163,15 +165,17 @@ SMODS.Voucher {
                     return true
                 end
             }))
-            -- TODO: REMOVE THIS CHEAT
-            G.E_MANAGER:add_event(Event({
-                func = function()
-                    SMODS.add_card({key="j_bootstraps"})
-                    SMODS.add_card({key="j_bull"})
-                    return true
-                end
-            }))
         end
+        -- TODO: REMOVE THIS CHEAT
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                SMODS.add_card({key="j_bootstraps"})
+                SMODS.add_card({key="j_bull"})
+                SMODS.add_card({key="j_bam_prophunt"})
+                SMODS.add_card({key="j_bam_patch1236"})
+                return true
+            end
+        }))
     end,
 
     in_pool = function(self, args)
@@ -245,8 +249,9 @@ SMODS.Voucher {
     loc_txt = {
         ['name'] = 'Placeholder 007',
         ['text'] = {
-            [1] = 'Legendary spectrals appear {C:attention}4X{}',
-            [2] = 'more frequently in spectral packs.',
+            [1] = '{C:legendary}Legendary spectrals{} appear',
+            [2] = '{C:attention}4X{} more frequently in',
+            [3] = "{C:spectral}Spectral{} and {C:planet}Planet{} packs."
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -255,6 +260,13 @@ SMODS.Voucher {
     atlas = 'BamlatroVouchers',
     pos = { x = 0, y = 0 },
     cost = 10,
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.c_soul
+        info_queue[#info_queue+1] = G.P_CENTERS.c_black_hole
+        info_queue[#info_queue+1] = G.P_CENTERS.c_bam_taptheglass
+        return {vars = {}}
+    end,
 
     redeem = function(self, card)
         SMODS.calculate_effect({
@@ -273,8 +285,9 @@ SMODS.Voucher {
     loc_txt = {
         ['name'] = 'Placeholder 008',
         ['text'] = {
-            [1] = 'Legendary spectrals appear {C:attention}16X{}',
-            [2] = 'more frequently in spectral packs.',
+            [1] = '{C:legendary}Legendary spectrals{} appear',
+            [2] = '{C:attention}16X{} more frequently in',
+            [3] = "{C:spectral}Spectral{} and {C:planet}Planet{} packs."
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -284,6 +297,13 @@ SMODS.Voucher {
     pos = { x = 0, y = 0 },
     cost = 10,
     requires = {"v_bam_placeholder_007"},
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.c_soul
+        info_queue[#info_queue+1] = G.P_CENTERS.c_black_hole
+        info_queue[#info_queue+1] = G.P_CENTERS.c_bam_taptheglass
+        return {vars = {}}
+    end,
 
     redeem = function(self, card)
         SMODS.calculate_effect({

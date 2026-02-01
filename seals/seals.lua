@@ -1,15 +1,16 @@
 SMODS.Seal{
-    key = "spam",
+    key = "bam_seal",
     loc_txt = {
-        ['name'] = 'Spam',
+        ['name'] = 'Bam Seal',
         ['text'] = {
-            [1] = 'When scored, {c:green}#1# in #2#{} chance',
-            [2] = 'to duplicate this card',
+            [1] = '{C:green}#1# in #2#{} chance to',
+            [2] = '{C:attention}duplicate{} card',
+            [3] = 'when scored',
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.',
         },
-        ["label"] = 'Spam',
+        ["label"] = 'Bam Seal',
     },
     atlas = "BamlatroEnhancements",
     pos = { x = 0, y = 0 },
@@ -18,6 +19,7 @@ SMODS.Seal{
             odds = 6,
         }
     },
+    badge_colour = HEX('7932C2'),
     sound = { sound = 'gold_seal', per = 1.2, vol = 1 },
 
     loc_vars = function(self, info_queue, card)

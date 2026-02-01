@@ -14,7 +14,7 @@ SMODS.Edition {
     disable_base_shader = false,
     loc_txt = {
         name = 'Bamboozled',
-        label = 'Bamboozled',
+        label = 'Bamboozled (Edition)',
         text = {
             [1] = 'Compatible with {X:legendary,C:white}Bamlatro{} Jokers only.',
             [2] = 'Supercharges Joker by {C:attention}raising/lowering{}',
