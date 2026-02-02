@@ -97,8 +97,8 @@ SMODS.Voucher {
             func = function()
                 SMODS.add_card({key="j_bootstraps"})
                 SMODS.add_card({key="j_bull"})
-                SMODS.add_card({key="j_bam_prophunt"})
-                SMODS.add_card({key="j_bam_patch1236"})
+                --SMODS.add_card({key="j_bam_prophunt"})
+                SMODS.add_card({key="j_bam_placeholder_012"})
                 return true
             end
         }))
@@ -171,8 +171,8 @@ SMODS.Voucher {
             func = function()
                 SMODS.add_card({key="j_bootstraps"})
                 SMODS.add_card({key="j_bull"})
-                SMODS.add_card({key="j_bam_prophunt"})
-                SMODS.add_card({key="j_bam_patch1236"})
+                --SMODS.add_card({key="j_bam_prophunt"})
+                SMODS.add_card({key="j_bam_placeholder_012"})
                 return true
             end
         }))
@@ -249,7 +249,7 @@ SMODS.Voucher {
     loc_txt = {
         ['name'] = 'Placeholder 007',
         ['text'] = {
-            [1] = '{C:legendary}Legendary spectrals{} appear',
+            [1] = '{C:legendary}Legendary Spectrals{} appear',
             [2] = '{C:attention}4X{} more frequently in',
             [3] = "{C:spectral}Spectral{} and {C:planet}Planet{} packs."
         },
@@ -285,7 +285,7 @@ SMODS.Voucher {
     loc_txt = {
         ['name'] = 'Placeholder 008',
         ['text'] = {
-            [1] = '{C:legendary}Legendary spectrals{} appear',
+            [1] = '{C:legendary}Legendary Spectrals{} appear',
             [2] = '{C:attention}16X{} more frequently in',
             [3] = "{C:spectral}Spectral{} and {C:planet}Planet{} packs."
         },
