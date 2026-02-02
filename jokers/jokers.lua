@@ -1288,7 +1288,7 @@ SMODS.Joker{
 --[[
 name: Crash Out
 ]]--
---[[SMODS.Joker{
+SMODS.Joker{
     key = "crashout",
     config = {
         extra = {
@@ -1298,9 +1298,9 @@ name: Crash Out
     loc_txt = {
         ['name'] = 'Crash Out',
         ['text'] = {
-            [1] = 'Played cards are 
-            [2] = 'always debuffed.',
-            [4] = 'Retrigger all jokers.',
+            [1] = 'Copies abilities of',
+            [2] = '{C:attention}all other jokers{}.',
+            [3] = 'All playing cards {C:attention}debuffed{}',
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -1314,21 +1314,204 @@ name: Crash Out
     unlocked = true,
     discovered = true,
     atlas = 'Bamlatro',
-    pos = { x = 0, y = 2 },
+    pos = { x = 1, y = 2 },
     pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
-        local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_prophunt') 
-        return {vars = {new_numerator, new_denominator, card.ability.extra.bam_bonus}}
+        if card.area and card.area == G.jokers then
+            local compatible_count = 0
+            for i, joker_card in ipairs (G.jokers.cards) do
+                if joker_card ~= card and joker_card.config.center.blueprint_compat then
+                    compatible_count = compatible_count + 1
+                end
+            end
+            local compat_bg_colour
+            local compat_text
+            if compatible_count > 0 then
+                compat_bg_colour = mix_colours(G.C.GREEN, G.C.JOKER_GREY, 0.8)
+                compat_text = tostring(compatible_count)..' compatible'
+            elseif true then
+                compat_bg_colour = mix_colours(G.C.RED, G.C.JOKER_GREY, 0.8)
+                compat_text = 'all incompatible'
+            end
+            main_end = {
+                {
+                    n = G.UIT.C,
+                    config = { align = "bm", minh = 0.4 },
+                    nodes = {
+                        {
+                            n = G.UIT.C,
+                            config = { ref_table = card, align = "m", colour = compat_bg_colour, r = 0.05, padding = 0.06 },
+                            nodes = {
+                                { n = G.UIT.T, config = { text = ' ' .. compat_text .. ' ', colour = G.C.UI.TEXT_LIGHT, scale = 0.32 * 0.8 } },
+                            }
+                        }
+                    }
+                }
+            }
+            return { main_end = main_end }
+        end
+    end,
+    
+    calculate = function(self, card, context)
+
+        if context.debuff_card then
+            return {debuff = context.debuff_card.playing_card}
+
+
+        --[[if context.before then
+            for i, hand_card in ipairs(context.full_hand) do
+                local scored_card = hand_card
+                SMODS.debuff_card(scored_card, true, "crashout")
+            end
+            return true
+
+        elseif context.after then
+            for i, hand_card in ipairs(context.full_hand) do
+                local scored_card = hand_card
+                SMODS.debuff_card(scored_card, false, "crashout")
+            end
+            return true
+        ]]--
+        elseif context.joker_main then
+            local other_joker = nil
+            local effects = {}
+            for i, joker_card in ipairs (G.jokers.cards) do
+                if joker_card ~= card then
+                    print("----------------------------------------------------")
+                    other_joker = G.jokers.cards[i]
+                    effect = SMODS.blueprint_effect(card, other_joker, context)
+                    effects[#effects+1] = effect
+                end
+            end
+            if next(effects) then return SMODS.merge_effects(effects) end
+        end
+    end,
+}
+
+--[[
+name: Rockslide
+]]--
+SMODS.Joker{
+    key = "rockslide",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Rockslide',
+        ['text'] = {
+            [1] = 'Each {V:1}Stone card{} in played',
+            [2] = 'hand gives {C:red}+#1#{} Mult per',
+            [3] = '{V:1}Stone card{} in played hand',
+            [4] = '{C:inactive}(1=+#1# each, 2=+#2# each, etc.){}',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        }
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 2, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.bam_bonus+2,(card.ability.extra.bam_bonus+2)*2,colours = { HEX('99a2b3') }}}
     end,
     
     calculate = function(self, card, context)
         if context.individual and context.cardarea == G.play  then
-        
-            local scored_card = context.other_card
-            SMODS.debuff_card(scored_card, true, "crashout")
-                
+            if SMODS.get_enhancements(context.other_card)["m_stone"] == true then
+                local mult_bonus = 0
+                for _, playing_card in pairs(context.scoring_hand or {}) do
+                    if SMODS.get_enhancements(playing_card)["m_stone"] == true then
+                        mult_bonus = mult_bonus + (card.ability.extra.bam_bonus+2)
+                    end
+                end
+                if mult_bonus > 0 then
+                    return {
+                        mult = mult_bonus
+                    }
+                end
+                return true
+            end
+        end
+    end
+}
+
+--[[
+name: Placeholder 012
+]]--
+SMODS.Joker{
+    key = "placeholder_012",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            cards_to_generate = 0,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 012',
+        ['text'] = {
+            [1] = 'After {V:1}Stone card{} is scored,',
+            [2] = '{C:attention}destroy it{} and {C:attention}add #1#{}',
+            [3] = 'random cards to deck',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 3, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {card.ability.extra.bam_bonus+1,colours = { HEX('99a2b3') }}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.destroy_card and context.destroy_card.should_destroy  then
+            return { remove = true }
+        end
+        if context.individual and context.cardarea == G.play  then
+            context.other_card.should_destroy = false
+            if SMODS.get_enhancements(context.other_card)["m_stone"] == true then
+                context.other_card.should_destroy = true
+                card.ability.extra.cards_to_generate = card.ability.extra.cards_to_generate + (card.ability.extra.bam_bonus+1)
+                for i = 1, 2 do
+                    SMODS.add_card({set="Playing Card", no_edition=true, enhanced_poll=1.0, area = G.deck})
+                end
+                return {
+                    message = "Crack!",
+                    colour = G.C.RED,
+                }
+            end
+        end
+        if context.after then
+            print(card.ability.extra.cards_to_generate)
+            if (card.ability.extra.cards_to_generate or 0) > 0 then
+                card.ability.extra.cards_to_generate = 0
+                return {
+                    message = "Cards Added!",
+                    colour = G.C.ORANGE,
+                }
+            end
+            card.ability.extra.cards_to_generate = 0
             return true
         end
     end
-}]]--
+}

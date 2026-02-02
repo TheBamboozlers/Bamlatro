@@ -34,11 +34,11 @@ Joker:
 
 	[ Done ] PROP HUNT: When numbered cards are scored, 1 in 2 chance to convert to Jack. When Jacks are scored, 1 in 2 chance to convert to random number.
 
-	[ ] GANG BEAST/CRASH OUT: Played cards are debuffed. Retrigger all other jokers (via blueprint-like effects). Legendary?
+	[ Done ] GANG BEAST/CRASH OUT: Played cards are debuffed. Retrigger all other jokers (via blueprint-like effects). Legendary?
 
-	[ ] Whenever a stone card is scored, break it and add 1/2 regular playing cards to deck.
+	[ Done ] After a stone card is scored, break it and add 1/2 regular playing cards to deck.
 
-	[ ] ROCK SLIDE: Each stone card played in hand gives +5 mult per stone card in hand.
+	[ Done ] ROCK SLIDE: Each stone card played in hand gives +5 mult per stone card in hand.
 
 	Add stone cards somehow?
 
@@ -61,6 +61,10 @@ rare:		0.2
 legendary:	0
 
 
-	
+1: 3
+2: 6 6
+3: 9 9 9
+4: 12 12 12 12
+5: 15 15 15 15 15
 
 	
