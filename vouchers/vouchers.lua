@@ -98,7 +98,7 @@ SMODS.Voucher {
                 SMODS.add_card({key="j_bootstraps"})
                 SMODS.add_card({key="j_bull"})
                 --SMODS.add_card({key="j_bam_prophunt"})
-                SMODS.add_card({key="j_bam_placeholder_012"})
+                SMODS.add_card({key="j_bam_placeholder_015"})
                 return true
             end
         }))
@@ -172,7 +172,7 @@ SMODS.Voucher {
                 SMODS.add_card({key="j_bootstraps"})
                 SMODS.add_card({key="j_bull"})
                 --SMODS.add_card({key="j_bam_prophunt"})
-                SMODS.add_card({key="j_bam_placeholder_012"})
+                SMODS.add_card({key="j_bam_placeholder_015"})
                 return true
             end
         }))

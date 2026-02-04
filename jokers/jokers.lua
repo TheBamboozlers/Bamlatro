@@ -247,7 +247,7 @@ SMODS.Joker{
     
     loc_vars = function(self, info_queue, card)
         local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_csgocrates') 
-        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator, 100*card.ability.extra.bam_bonus}}
+        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator, 50*card.ability.extra.bam_bonus}}
     end,
     
     calculate = function(self, card, context)
@@ -266,15 +266,15 @@ SMODS.Joker{
                             end
                         end
                         local target_card = G.jokers.cards[my_pos]
-                        if card.ability.extra.sellValueIncrease > 100*card.ability.extra.bam_bonus then
-                            card.ability.extra.sellValueIncrease = 100*card.ability.extra.bam_bonus
+                        if card.ability.extra.sellValueIncrease > 50*card.ability.extra.bam_bonus then
+                            card.ability.extra.sellValueIncrease = 50*card.ability.extra.bam_bonus
                         end
                         target_card.ability.extra_value = (card.ability.extra.sellValueIncrease - 1)
                         target_card:set_cost()
                         return true
                     end,
-                    message = (card.ability.extra.sellValueIncrease >= 63) and "Max!" or "Double!",
-                    colour = (card.ability.extra.sellValueIncrease >= 63) and G.C.FILTER or G.C.MONEY
+                    message = (card.ability.extra.sellValueIncrease >= 30*card.ability.extra.bam_bonus) and "Max!" or "Double!",
+                    colour = (card.ability.extra.sellValueIncrease >= 30*card.ability.extra.bam_bonus) and G.C.FILTER or G.C.MONEY
                 }
             }
         end
@@ -934,7 +934,7 @@ SMODS.Joker{
     loc_txt = {
         ['name'] = 'Placeholder 010',
         ['text'] = {
-            [1] = 'Whenever a {C:planet}planet card{} is used,',
+            [1] = 'Whenever a {C:planet}Planet card{} is used,',
             [2] = '{C:attention}destroy{} up to {C:attention}#1# selected{}',
             [3] = 'playing card in hand'
         },
@@ -1402,8 +1402,8 @@ SMODS.Joker{
     loc_txt = {
         ['name'] = 'Rockslide',
         ['text'] = {
-            [1] = 'Each {V:1}Stone card{} in played',
-            [2] = 'hand gives {C:red}+#1#{} Mult per',
+            [1] = 'Each {V:1}Stone card{} played',
+            [2] = 'gives {C:red}+#1#{} Mult per',
             [3] = '{V:1}Stone card{} in played hand',
             [4] = '{C:inactive}(1=+#1# each, 2=+#2# each, etc.){}',
         },
@@ -1515,3 +1515,324 @@ SMODS.Joker{
         end
     end
 }
+
+--[[
+name: Placeholder 013
+]]--
+SMODS.Joker{
+    key = "placeholder_013",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 013',
+        ['text'] = {
+            [1] = '{V:1}Stone cards{} also',
+            [2] = 'give {X:chips,C:white}x#1#{} Chips',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 4, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {(1+(card.ability.extra.bam_bonus*0.25)),colours = { HEX('99a2b3') }}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+            if SMODS.get_enhancements(context.other_card)["m_stone"] == true then
+                return {
+                    x_chips = (1+(card.ability.extra.bam_bonus*0.25))
+                }
+            end
+        end
+    end
+}
+
+--[[
+name: Placeholder 014
+]]--
+SMODS.Joker{
+    key = "placeholder_014",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            tags_gained = 0
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 014',
+        ['text'] = {
+            [1] = 'This joker permanently gains',
+            [2] = '{C:mult}+#1#{} Mult per {C:blue}Tag{} obtained',
+            [3] = '{C:inactive}(Currently {}{C:mult}+#2#{}{C:inactive} Mult){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 5, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {(card.ability.extra.bam_bonus+2), (card.ability.extra.tags_gained * (card.ability.extra.bam_bonus+2))}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.tag_added  then
+            card.ability.extra.tags_gained = card.ability.extra.tags_gained + 1
+
+            return {
+                message = "Mult Up!",
+                colour = G.C.ORANGE,
+            }
+        end
+        if context.cardarea == G.jokers and context.joker_main  then
+            return {
+                mult = card.ability.extra.tags_gained * (card.ability.extra.bam_bonus+2)
+            }
+        end
+    end
+}
+
+--[[
+name: Placeholder 015
+]]--
+SMODS.Joker{
+    key = "placeholder_015",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            shopping_total = 0,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 015',
+        ['text'] = {
+            [1] = 'When you spend at least',
+            [2] = '{C:money}$#1#{} total in a {C:green}Shop{},',
+            [3] = 'gain a {C:blue}Coupon Tag{}',
+            [4] = '{C:inactive}(Currently $#2#)',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 6, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_coupon
+        return {vars = {(card.ability.extra.bam_bonus*-5)+35, card.ability.extra.shopping_total}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.reroll_shop and context.cost > 0 then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.buying_card then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.open_booster then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.ending_shop  then
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                card.ability.extra.shopping_total = 0
+                return {
+                func = function()
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            local tag = Tag("tag_coupon")
+                            if tag.name == "Orbital Tag" then
+                                local _poker_hands = {}
+                                for k, v in pairs(G.GAME.hands) do
+                                    if v.visible then
+                                        _poker_hands[#_poker_hands + 1] = k
+                                    end
+                                end
+                                tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                            end
+                            tag:set_ability()
+                            add_tag(tag)
+                            play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                            return true
+                        end
+                    }))
+                    return true
+                end,
+                message = "Created Tag!",
+                colour = G.C.GREEN
+                }
+            end
+            card.ability.extra.shopping_total = 0
+        end
+    end
+}
+
+--[[
+name: Placeholder 016
+]]--
+--globals
+--[[G.GAME.j_bam_placeholder_016_source_rank = 2
+G.GAME.j_bam_placeholder_016_target_rank = 3
+SMODS.Joker{
+    key = "placeholder_016",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 016',
+        ['text'] = {
+            [1] = 'Each #2# is instead',
+            [2] = 'considered a #3#.',
+            [3] = 'Ranks randomized on pickup',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 7, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {(card.ability.extra.bam_bonus), j_bam_placeholder_016_source_rank, j_bam_placeholder_016_target_rank}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.reroll_shop and context.cost > 0 then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.buying_card then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.open_booster then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.ending_shop  then
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                card.ability.extra.shopping_total = 0
+                return {
+                func = function()
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            local tag = Tag("tag_coupon")
+                            if tag.name == "Orbital Tag" then
+                                local _poker_hands = {}
+                                for k, v in pairs(G.GAME.hands) do
+                                    if v.visible then
+                                        _poker_hands[#_poker_hands + 1] = k
+                                    end
+                                end
+                                tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                            end
+                            tag:set_ability()
+                            add_tag(tag)
+                            play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                            return true
+                        end
+                    }))
+                    return true
+                end,
+                message = "Created Tag!",
+                colour = G.C.GREEN
+                }
+            end
+            card.ability.extra.shopping_total = 0
+        end
+    end
+}
+local card_get_id_ref = Card.get_id
+function Card:get_id()
+    local original_id = card_get_id_ref(self)
+    if not original_id then return original_id end
+
+    if next(SMODS.find_card("j_bam_placeholder_016")) then
+        local source_ids = {j_bam_placeholder_016_source_rank}
+        for _, source_id in pairs(source_ids) do
+            if original_id == source_id then return 14 end
+        end
+    end
+    return original_id
+end]]--
