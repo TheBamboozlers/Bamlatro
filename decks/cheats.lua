@@ -14,7 +14,7 @@ SMODS.Back {
     atlas = "Bamlatro",
     pos = { x = 0, y = 0 },
     config = { 
-        dollars = 9999999, 
+        dollars = 9, 
         hands = 0, 
         discards = 99, 
         joker_slot = 10, 

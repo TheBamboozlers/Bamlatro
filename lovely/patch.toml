@@ -1,0 +1,28 @@
+[manifest]
+version = "0.0.1"
+dump_lua = true
+priority = -10
+
+# Card:get_id()
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "return self.base.id"
+match_indent = true
+position = "at"
+payload = '''local has_placeholder_016 = false
+    if G.jokers and G.jokers.cards then
+        for i, joker in ipairs(G.jokers.cards) do
+            if joker.config.center.key == "j_bam_placeholder_016" then
+                has_placeholder_016 = true
+            end
+        end
+    end
+    if has_placeholder_016 then
+        if G.GAME["bam_placeholder_016_source"] ~= nil and G.GAME["bam_placeholder_016_target"] ~= nil then
+            if self.base.id == G.GAME["bam_placeholder_016_source"] then
+                return tonumber(G.GAME["bam_placeholder_016_target"])
+            end
+        end
+    end
+    return self.base.id'''

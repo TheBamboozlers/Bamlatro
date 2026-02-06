@@ -1146,6 +1146,8 @@ SMODS.Joker{
         return {vars = {card.ability.extra.bam_bonus}}
     end,
     
+    --[[   Old (and bad) implementation
+    
     calculate = function(self, card, context)
         if G.GAME.round_resets.hands ~= card.ability.extra.bam_bonus then
             local diff = G.GAME.round_resets.hands - card.ability.extra.bam_bonus
@@ -1166,7 +1168,33 @@ SMODS.Joker{
         G.hand:change_size(-1*card.ability.extra.hands_removed) 
         G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + card.ability.extra.hands_removed
         card.ability.extra.hands_removed = 0
+    end,]]--
+
+    calculate = function(self, card, context)
+        if context.setting_blind then
+
+            if G.GAME.current_round.hands_left - card.ability.extra.hands_removed ~= 1 then
+                local diff = G.GAME.current_round.hands_left - card.ability.extra.hands_removed - 1
+                G.hand:change_size(diff)
+                card.ability.extra.hands_removed = G.GAME.current_round.hands_left - 1
+            end
+            
+            G.GAME.current_round.hands_left = 1
+        end
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        G.hand:change_size(-1*card.ability.extra.hands_removed)
+        if from_debuff == false then
+            card.ability.extra.hands_removed = 0
+        end
+    end,
+
+    add_to_deck = function(self, card, from_debuff)
+        G.hand:change_size(card.ability.extra.hands_removed)
     end
+
+
 }
 
 --[[
@@ -1722,23 +1750,29 @@ SMODS.Joker{
 
 --[[
 name: Placeholder 016
+
+TODO:
+    - Duplicates overwrite previous copies. Either fix, or debuff previous copies upon duplicate pickup.
+TODO:
+    - make bam_bonus compatible
+TODO:
+    - ranks arent randomized on pickup, but rather on card creation. fix, or fix wording?
+
 ]]--
---globals
---[[G.GAME.j_bam_placeholder_016_source_rank = 2
-G.GAME.j_bam_placeholder_016_target_rank = 3
 SMODS.Joker{
     key = "placeholder_016",
     config = {
         extra = {
-            bam_bonus = 1,
+            source_rank = nil,
+            target_rank = nil,
         }
     },
     loc_txt = {
         ['name'] = 'Placeholder 016',
         ['text'] = {
-            [1] = 'Each #2# is instead',
-            [2] = 'considered a #3#.',
-            [3] = 'Ranks randomized on pickup',
+            [1] = 'Each {C:attention}#1#{} is instead',
+            [2] = 'considered a {C:attention}#2#{}.',
+            [3] = '{C:inactive}Ranks randomized on pickup{}',
         },
         ['unlock'] = {
             [1] = 'Unlocked by default.'
@@ -1756,83 +1790,194 @@ SMODS.Joker{
     pools = { ["bam_jokers"] = true },
 
     loc_vars = function(self, info_queue, card)
-        return {vars = {(card.ability.extra.bam_bonus), j_bam_placeholder_016_source_rank, j_bam_placeholder_016_target_rank}}
+
+        if card.ability.extra.source_rank == nil then
+            return {vars = {"X","Y"}}
+        elseif true then
+        
+            return {vars = {card.ability.extra.source_rank.key, card.ability.extra.target_rank.key}}
+        end
+    end,
+
+    set_ability = function(self, card, initial)
+
+        -- this code is messy and disgraceful... but it works!
+
+        -- get a random rank that is non-face and non-ace
+        local source = pseudorandom_element(SMODS.Ranks, pseudoseed('random rank'))
+        local tries_a = 0
+        while tries_a < 20 and (source.id < 2 or source.id > 10) do
+            source = pseudorandom_element(SMODS.Ranks, pseudoseed('random rank'))
+            tries_a = tries_a + 1
+        end
+
+        -- get a random rank that is either face or ace, but not first source rank
+        local target = source
+        local tries_b = 0
+        while tries_b < 20 and ((target.id > 1 and target.id < 11) or (target.id == source.id)) do
+            target = pseudorandom_element(SMODS.Ranks, pseudoseed('pick again'))
+            tries_b = tries_b + 1
+        end
+        card.ability.extra.source_rank = source
+        card.ability.extra.target_rank = target
+        G.GAME.bam_placeholder_016_source = card.ability.extra.source_rank.id
+        G.GAME.bam_placeholder_016_target = card.ability.extra.target_rank.id
     end,
     
+}
+
+--[[
+name: Placeholder 017
+]]--
+SMODS.Joker{
+    key = "placeholder_017",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 017',
+        ['text'] = {
+            [1] = 'Every round, convert',
+            [2] = 'all {C:red}Discards{} into {C:blue}Hands{}.',
+            [3] = '{X:attention,C:white}X#1#{} {C:attention}Blind requirement{}',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 1, y = 0 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {3-card.ability.extra.bam_bonus}}
+    end,
+
     calculate = function(self, card, context)
-        if context.reroll_shop and context.cost > 0 then
-            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.cost
-            card:juice_up(0.3, 0.5)
-            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+        if context.setting_blind  then
+            return {
+                
+                func = function()
+                    if G.GAME.blind.in_blind then
+                        
+                        card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = "X"..tostring(3-card.ability.extra.bam_bonus).." Blind Size", colour = G.C.GREEN})
+                        G.GAME.blind.chips = G.GAME.blind.chips * (3-card.ability.extra.bam_bonus)
+                        G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+                        G.HUD_blind:recalculate()
+                        return true
+                    end
+                end
+            }
+        end
+        if context.first_hand_drawn  then
+            
+            G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + G.GAME.current_round.discards_left
+        
+            G.GAME.current_round.discards_left = 0
+                   
+        end
+    end
+}
+
+--[[
+name: Placeholder 018
+]]--
+SMODS.Joker{
+    key = "privateequity",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            debt_triggers = 0
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Private Equity',
+        ['text'] = {
+            [1] = 'Can go up to {C:red}-$15{} in debt.',
+            [2] = 'Whenever you go into {C:attention}further debt{},',
+            [3] = 'this Joker gains {C:red}+#1#{} Mult',
+            [4] = '{C:inactive}(Currently {}{C:mult}+#2#{}{C:inactive} Mult){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 2, y = 0 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {2+(card.ability.extra.bam_bonus*2), card.ability.extra.debt_triggers * (2+(card.ability.extra.bam_bonus*2))}}
+    end,
+
+    calculate = function(self, card, context)
+
+        if context.cardarea == G.jokers and context.joker_main  then
+            return {
+                mult = card.ability.extra.debt_triggers * (2+(card.ability.extra.bam_bonus*2))
+            }
+        end
+
+        if context.buying_card then
+            if G.GAME.dollars - context.card.cost < 0 then
                 return {
-                    message = "Threshold Met",
-                    colour = G.C.ORANGE,
+                    func = function()
+                        card.ability.extra.debt_triggers = card.ability.extra.debt_triggers + 1
+                        return true
+                    end,
+                    message = "+"..tostring((2+(card.ability.extra.bam_bonus*2))).." Mult",
+                    colour = G.C.MULT
                 }
             end
         end
-        if context.buying_card then
-            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
-            card:juice_up(0.3, 0.5)
-            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+        if context.reroll_shop and context.cost > 0 then
+            if G.GAME.dollars - context.cost < 0 then
                 return {
-                    message = "Threshold Met",
-                    colour = G.C.ORANGE,
+                    func = function()
+                        card.ability.extra.debt_triggers = card.ability.extra.debt_triggers + 1
+                        return true
+                    end,
+                    message = "+"..tostring((2+(card.ability.extra.bam_bonus*2))).." Mult",
+                    colour = G.C.MULT
                 }
             end
         end
         if context.open_booster then
-            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
-            card:juice_up(0.3, 0.5)
-            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+            if G.GAME.dollars - context.card.cost < 0 then
                 return {
-                    message = "Threshold Met",
-                    colour = G.C.ORANGE,
+                    func = function()
+                        card.ability.extra.debt_triggers = card.ability.extra.debt_triggers + 1
+                        return true
+                    end,
+                    message = "+"..tostring((2+(card.ability.extra.bam_bonus*2))).." Mult",
+                    colour = G.C.MULT
                 }
             end
         end
-        if context.ending_shop  then
-            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
-                card.ability.extra.shopping_total = 0
-                return {
-                func = function()
-                    G.E_MANAGER:add_event(Event({
-                        func = function()
-                            local tag = Tag("tag_coupon")
-                            if tag.name == "Orbital Tag" then
-                                local _poker_hands = {}
-                                for k, v in pairs(G.GAME.hands) do
-                                    if v.visible then
-                                        _poker_hands[#_poker_hands + 1] = k
-                                    end
-                                end
-                                tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
-                            end
-                            tag:set_ability()
-                            add_tag(tag)
-                            play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
-                            return true
-                        end
-                    }))
-                    return true
-                end,
-                message = "Created Tag!",
-                colour = G.C.GREEN
-                }
-            end
-            card.ability.extra.shopping_total = 0
-        end
+
+    end,
+    
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.bankrupt_at = G.GAME.bankrupt_at - 15
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.bankrupt_at = G.GAME.bankrupt_at + 15
     end
 }
-local card_get_id_ref = Card.get_id
-function Card:get_id()
-    local original_id = card_get_id_ref(self)
-    if not original_id then return original_id end
-
-    if next(SMODS.find_card("j_bam_placeholder_016")) then
-        local source_ids = {j_bam_placeholder_016_source_rank}
-        for _, source_id in pairs(source_ids) do
-            if original_id == source_id then return 14 end
-        end
-    end
-    return original_id
-end]]--
