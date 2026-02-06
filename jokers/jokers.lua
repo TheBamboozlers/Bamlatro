@@ -247,7 +247,7 @@ SMODS.Joker{
     
     loc_vars = function(self, info_queue, card)
         local new_numerator, new_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_bam_csgocrates') 
-        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator, 100*card.ability.extra.bam_bonus}}
+        return {vars = {card.ability.extra.sellValueIncrease, card.ability.extra.var1, new_numerator, new_denominator, 50*card.ability.extra.bam_bonus}}
     end,
     
     calculate = function(self, card, context)
@@ -266,15 +266,15 @@ SMODS.Joker{
                             end
                         end
                         local target_card = G.jokers.cards[my_pos]
-                        if card.ability.extra.sellValueIncrease > 100*card.ability.extra.bam_bonus then
-                            card.ability.extra.sellValueIncrease = 100*card.ability.extra.bam_bonus
+                        if card.ability.extra.sellValueIncrease > 50*card.ability.extra.bam_bonus then
+                            card.ability.extra.sellValueIncrease = 50*card.ability.extra.bam_bonus
                         end
                         target_card.ability.extra_value = (card.ability.extra.sellValueIncrease - 1)
                         target_card:set_cost()
                         return true
                     end,
-                    message = (card.ability.extra.sellValueIncrease >= 63) and "Max!" or "Double!",
-                    colour = (card.ability.extra.sellValueIncrease >= 63) and G.C.FILTER or G.C.MONEY
+                    message = (card.ability.extra.sellValueIncrease >= 30*card.ability.extra.bam_bonus) and "Max!" or "Double!",
+                    colour = (card.ability.extra.sellValueIncrease >= 30*card.ability.extra.bam_bonus) and G.C.FILTER or G.C.MONEY
                 }
             }
         end
@@ -934,7 +934,7 @@ SMODS.Joker{
     loc_txt = {
         ['name'] = 'Placeholder 010',
         ['text'] = {
-            [1] = 'Whenever a {C:planet}planet card{} is used,',
+            [1] = 'Whenever a {C:planet}Planet card{} is used,',
             [2] = '{C:attention}destroy{} up to {C:attention}#1# selected{}',
             [3] = 'playing card in hand'
         },
@@ -1146,6 +1146,8 @@ SMODS.Joker{
         return {vars = {card.ability.extra.bam_bonus}}
     end,
     
+    --[[   Old (and bad) implementation
+    
     calculate = function(self, card, context)
         if G.GAME.round_resets.hands ~= card.ability.extra.bam_bonus then
             local diff = G.GAME.round_resets.hands - card.ability.extra.bam_bonus
@@ -1166,7 +1168,33 @@ SMODS.Joker{
         G.hand:change_size(-1*card.ability.extra.hands_removed) 
         G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + card.ability.extra.hands_removed
         card.ability.extra.hands_removed = 0
+    end,]]--
+
+    calculate = function(self, card, context)
+        if context.setting_blind then
+
+            if G.GAME.current_round.hands_left - card.ability.extra.hands_removed ~= 1 then
+                local diff = G.GAME.current_round.hands_left - card.ability.extra.hands_removed - 1
+                G.hand:change_size(diff)
+                card.ability.extra.hands_removed = G.GAME.current_round.hands_left - 1
+            end
+            
+            G.GAME.current_round.hands_left = 1
+        end
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        G.hand:change_size(-1*card.ability.extra.hands_removed)
+        if from_debuff == false then
+            card.ability.extra.hands_removed = 0
+        end
+    end,
+
+    add_to_deck = function(self, card, from_debuff)
+        G.hand:change_size(card.ability.extra.hands_removed)
     end
+
+
 }
 
 --[[
@@ -1402,8 +1430,8 @@ SMODS.Joker{
     loc_txt = {
         ['name'] = 'Rockslide',
         ['text'] = {
-            [1] = 'Each {V:1}Stone card{} in played',
-            [2] = 'hand gives {C:red}+#1#{} Mult per',
+            [1] = 'Each {V:1}Stone card{} played',
+            [2] = 'gives {C:red}+#1#{} Mult per',
             [3] = '{V:1}Stone card{} in played hand',
             [4] = '{C:inactive}(1=+#1# each, 2=+#2# each, etc.){}',
         },
@@ -1513,5 +1541,443 @@ SMODS.Joker{
             card.ability.extra.cards_to_generate = 0
             return true
         end
+    end
+}
+
+--[[
+name: Placeholder 013
+]]--
+SMODS.Joker{
+    key = "placeholder_013",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 013',
+        ['text'] = {
+            [1] = '{V:1}Stone cards{} also',
+            [2] = 'give {X:chips,C:white}x#1#{} Chips',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 4, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {(1+(card.ability.extra.bam_bonus*0.25)),colours = { HEX('99a2b3') }}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play  then
+            if SMODS.get_enhancements(context.other_card)["m_stone"] == true then
+                return {
+                    x_chips = (1+(card.ability.extra.bam_bonus*0.25))
+                }
+            end
+        end
+    end
+}
+
+--[[
+name: Placeholder 014
+]]--
+SMODS.Joker{
+    key = "placeholder_014",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            tags_gained = 0
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 014',
+        ['text'] = {
+            [1] = 'This joker permanently gains',
+            [2] = '{C:mult}+#1#{} Mult per {C:blue}Tag{} obtained',
+            [3] = '{C:inactive}(Currently {}{C:mult}+#2#{}{C:inactive} Mult){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 5, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {(card.ability.extra.bam_bonus+2), (card.ability.extra.tags_gained * (card.ability.extra.bam_bonus+2))}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.tag_added  then
+            card.ability.extra.tags_gained = card.ability.extra.tags_gained + 1
+
+            return {
+                message = "Mult Up!",
+                colour = G.C.ORANGE,
+            }
+        end
+        if context.cardarea == G.jokers and context.joker_main  then
+            return {
+                mult = card.ability.extra.tags_gained * (card.ability.extra.bam_bonus+2)
+            }
+        end
+    end
+}
+
+--[[
+name: Placeholder 015
+]]--
+SMODS.Joker{
+    key = "placeholder_015",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            shopping_total = 0,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 015',
+        ['text'] = {
+            [1] = 'When you spend at least',
+            [2] = '{C:money}$#1#{} total in a {C:green}Shop{},',
+            [3] = 'gain a {C:blue}Coupon Tag{}',
+            [4] = '{C:inactive}(Currently $#2#)',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 6, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_TAGS.tag_coupon
+        return {vars = {(card.ability.extra.bam_bonus*-5)+35, card.ability.extra.shopping_total}}
+    end,
+    
+    calculate = function(self, card, context)
+        if context.reroll_shop and context.cost > 0 then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.buying_card then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.open_booster then
+            card.ability.extra.shopping_total = card.ability.extra.shopping_total + context.card.cost
+            card:juice_up(0.3, 0.5)
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                return {
+                    message = "Threshold Met",
+                    colour = G.C.ORANGE,
+                }
+            end
+        end
+        if context.ending_shop  then
+            if card.ability.extra.shopping_total >= ((card.ability.extra.bam_bonus*-5)+35) then
+                card.ability.extra.shopping_total = 0
+                return {
+                func = function()
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            local tag = Tag("tag_coupon")
+                            if tag.name == "Orbital Tag" then
+                                local _poker_hands = {}
+                                for k, v in pairs(G.GAME.hands) do
+                                    if v.visible then
+                                        _poker_hands[#_poker_hands + 1] = k
+                                    end
+                                end
+                                tag.ability.orbital_hand = pseudorandom_element(_poker_hands, "jokerforge_orbital")
+                            end
+                            tag:set_ability()
+                            add_tag(tag)
+                            play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                            return true
+                        end
+                    }))
+                    return true
+                end,
+                message = "Created Tag!",
+                colour = G.C.GREEN
+                }
+            end
+            card.ability.extra.shopping_total = 0
+        end
+    end
+}
+
+--[[
+name: Placeholder 016
+
+TODO:
+    - Duplicates overwrite previous copies. Either fix, or debuff previous copies upon duplicate pickup.
+TODO:
+    - make bam_bonus compatible
+TODO:
+    - ranks arent randomized on pickup, but rather on card creation. fix, or fix wording?
+
+]]--
+SMODS.Joker{
+    key = "placeholder_016",
+    config = {
+        extra = {
+            source_rank = nil,
+            target_rank = nil,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 016',
+        ['text'] = {
+            [1] = 'Each {C:attention}#1#{} is instead',
+            [2] = 'considered a {C:attention}#2#{}.',
+            [3] = '{C:inactive}Ranks randomized on pickup{}',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 7, y = 2 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+
+        if card.ability.extra.source_rank == nil then
+            return {vars = {"X","Y"}}
+        elseif true then
+        
+            return {vars = {card.ability.extra.source_rank.key, card.ability.extra.target_rank.key}}
+        end
+    end,
+
+    set_ability = function(self, card, initial)
+
+        -- this code is messy and disgraceful... but it works!
+
+        -- get a random rank that is non-face and non-ace
+        local source = pseudorandom_element(SMODS.Ranks, pseudoseed('random rank'))
+        local tries_a = 0
+        while tries_a < 20 and (source.id < 2 or source.id > 10) do
+            source = pseudorandom_element(SMODS.Ranks, pseudoseed('random rank'))
+            tries_a = tries_a + 1
+        end
+
+        -- get a random rank that is either face or ace, but not first source rank
+        local target = source
+        local tries_b = 0
+        while tries_b < 20 and ((target.id > 1 and target.id < 11) or (target.id == source.id)) do
+            target = pseudorandom_element(SMODS.Ranks, pseudoseed('pick again'))
+            tries_b = tries_b + 1
+        end
+        card.ability.extra.source_rank = source
+        card.ability.extra.target_rank = target
+        G.GAME.bam_placeholder_016_source = card.ability.extra.source_rank.id
+        G.GAME.bam_placeholder_016_target = card.ability.extra.target_rank.id
+    end,
+    
+}
+
+--[[
+name: Placeholder 017
+]]--
+SMODS.Joker{
+    key = "placeholder_017",
+    config = {
+        extra = {
+            bam_bonus = 1,
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Placeholder 017',
+        ['text'] = {
+            [1] = 'Every round, convert',
+            [2] = 'all {C:red}Discards{} into {C:blue}Hands{}.',
+            [3] = '{X:attention,C:white}X#1#{} {C:attention}Blind requirement{}',
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 1, y = 0 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {3-card.ability.extra.bam_bonus}}
+    end,
+
+    calculate = function(self, card, context)
+        if context.setting_blind  then
+            return {
+                
+                func = function()
+                    if G.GAME.blind.in_blind then
+                        
+                        card_eval_status_text(context.blueprint_card or card, 'extra', nil, nil, nil, {message = "X"..tostring(3-card.ability.extra.bam_bonus).." Blind Size", colour = G.C.GREEN})
+                        G.GAME.blind.chips = G.GAME.blind.chips * (3-card.ability.extra.bam_bonus)
+                        G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+                        G.HUD_blind:recalculate()
+                        return true
+                    end
+                end
+            }
+        end
+        if context.first_hand_drawn  then
+            
+            G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + G.GAME.current_round.discards_left
+        
+            G.GAME.current_round.discards_left = 0
+                   
+        end
+    end
+}
+
+--[[
+name: Placeholder 018
+]]--
+SMODS.Joker{
+    key = "privateequity",
+    config = {
+        extra = {
+            bam_bonus = 1,
+            debt_triggers = 0
+        }
+    },
+    loc_txt = {
+        ['name'] = 'Private Equity',
+        ['text'] = {
+            [1] = 'Can go up to {C:red}-$15{} in debt.',
+            [2] = 'Whenever you go into {C:attention}further debt{},',
+            [3] = 'this Joker gains {C:red}+#1#{} Mult',
+            [4] = '{C:inactive}(Currently {}{C:mult}+#2#{}{C:inactive} Mult){}'
+        },
+        ['unlock'] = {
+            [1] = 'Unlocked by default.'
+        },
+    },
+    cost = 4,
+    rarity = 2,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
+    unlocked = true,
+    discovered = true,
+    atlas = 'Bamlatro',
+    pos = { x = 2, y = 0 },
+    pools = { ["bam_jokers"] = true },
+
+    loc_vars = function(self, info_queue, card)
+        return {vars = {2+(card.ability.extra.bam_bonus*2), card.ability.extra.debt_triggers * (2+(card.ability.extra.bam_bonus*2))}}
+    end,
+
+    calculate = function(self, card, context)
+
+        if context.cardarea == G.jokers and context.joker_main  then
+            return {
+                mult = card.ability.extra.debt_triggers * (2+(card.ability.extra.bam_bonus*2))
+            }
+        end
+
+        if context.buying_card then
+            if G.GAME.dollars - context.card.cost < 0 then
+                return {
+                    func = function()
+                        card.ability.extra.debt_triggers = card.ability.extra.debt_triggers + 1
+                        return true
+                    end,
+                    message = "+"..tostring((2+(card.ability.extra.bam_bonus*2))).." Mult",
+                    colour = G.C.MULT
+                }
+            end
+        end
+        if context.reroll_shop and context.cost > 0 then
+            if G.GAME.dollars - context.cost < 0 then
+                return {
+                    func = function()
+                        card.ability.extra.debt_triggers = card.ability.extra.debt_triggers + 1
+                        return true
+                    end,
+                    message = "+"..tostring((2+(card.ability.extra.bam_bonus*2))).." Mult",
+                    colour = G.C.MULT
+                }
+            end
+        end
+        if context.open_booster then
+            if G.GAME.dollars - context.card.cost < 0 then
+                return {
+                    func = function()
+                        card.ability.extra.debt_triggers = card.ability.extra.debt_triggers + 1
+                        return true
+                    end,
+                    message = "+"..tostring((2+(card.ability.extra.bam_bonus*2))).." Mult",
+                    colour = G.C.MULT
+                }
+            end
+        end
+
+    end,
+    
+    add_to_deck = function(self, card, from_debuff)
+        G.GAME.bankrupt_at = G.GAME.bankrupt_at - 15
+    end,
+    
+    remove_from_deck = function(self, card, from_debuff)
+        G.GAME.bankrupt_at = G.GAME.bankrupt_at + 15
     end
 }
